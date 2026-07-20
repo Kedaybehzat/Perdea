@@ -1,4 +1,5 @@
 import KarsilamaKarti from "@/components/KarsilamaKarti";
+import Sayac from "@/components/Sayac";
 
 export default function Home() {
   return (
@@ -19,6 +20,8 @@ export default function Home() {
         baslik="Keşif"
         aciklama="Algoritmanın seçtiği değil, gerçek insanların önerdiği yapımları keşfet."
       />
+      
+      <Sayac />
     </main>
   );
 }

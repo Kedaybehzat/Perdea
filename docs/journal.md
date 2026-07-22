@@ -60,5 +60,14 @@ Modül 1 — Next.js Temelleri: React'in mantığını öğrenme, ilk Next.js pr
 - Uzun bir aradan sonra döndüğümde `npm run dev` sessizce takıldı → `rm -rf node_modules .next` sonra `npm install` ile çözdüm
 - `useState`'in mantığını "sayaç" örneğinde soyut buldum, "beğeni butonu" gibi Perdea'ya yakın örneklerle daha iyi oturdu
 
-### Sonraki adım
-Modül 2 — Tailwind ve UI Tasarımı: Gerçek Perdea sayfalarına başlangıç, renk paleti kararı, header/footer tasarımı, film kartı prototipi
+## Modül 2 — Tailwind ve UI Tasarımı (20 Temmuz 2026 — devam ediyor)
+
+### Şimdiye kadar yapıldı
+- Marka kimliği kararı: zümrüt yeşili + krem tonu ("eski sinema afişleri" hissi)
+- `app/globals.css` CSS değişkenleriyle tema kuruldu
+- `page.tsx`, `KarsilamaKarti.tsx`, `Sayac.tsx` yeni temaya uydu
+- Kartlar beyaza döndü, gölge + hover efektleri eklendi
+- Zümrüt vurgu rengi butonlar ve başlıklarda
+
+### Sonraki adım (Görev 2.3)
+Header component'i — logo + navigasyon

@@ -69,5 +69,35 @@ Modül 1 — Next.js Temelleri: React'in mantığını öğrenme, ilk Next.js pr
 - Kartlar beyaza döndü, gölge + hover efektleri eklendi
 - Zümrüt vurgu rengi butonlar ve başlıklarda
 
-### Sonraki adım (Görev 2.3)
-Header component'i — logo + navigasyon
+## Modül 2 — Tailwind ve UI Tasarımı (22 Temmuz 2026)
+
+### Ne yaptım?
+- Marka kimliği kararı: zümrüt yeşili + krem tonu ("eski sinema afişleri" hissi)
+- CSS değişkenleriyle merkezi tema kurdum (app/globals.css)
+- Header component'i: logo + navigasyon (Keşfet, Eşleş, Topluluk, Vizyon) + Giriş/Kayıt butonları, sticky yaptım
+- Footer component'i: 4 sütunlu, telif + TMDB atıf
+- YakindaSayfasi reusable component'i yazdım — 4 farklı placeholder sayfayı besliyor
+- 4 placeholder sayfa açtım (/kesfet, /eslesme, /topluluk, /vizyon)
+- Anasayfayı tamamen yeniden tasarladım: hero + özellikler grid + nasıl çalışır + alt CTA
+- Öğrenme örneklerini (Sayac) ana sayfadan kaldırdım
+
+### Ne öğrendim?
+- Next.js layout.tsx'i her sayfada otomatik saran iskelet — Header/Footer buraya konur
+- Tailwind grid sistemi (grid-cols-2 md:grid-cols-4) responsive tasarımı çok kolaylaştırıyor
+- `flex-1` ve `mt-auto` Flexbox trickleri — footer'ı sayfa altına yapıştırma
+- Bir component farklı props ile 4-5 sayfada kullanılabilir (YakindaSayfasi)
+- CSS değişkenleriyle merkezi renk yönetimi — bir yerden değiştir, her yer güncellenir
+- İyi bir "coming soon" sayfası e-posta toplamaz, hesap açma yönlendirir
+
+### Ürün kararları
+- Kimlik: Beyazperde + Letterboxd + Discord birleşimi (üç rakibi tek çatı)
+- Header linkleri Faz 1-3'ü temsil ediyor (Keşfet=katalog, Eşleş=eşleşme, Topluluk=grup/forum, Vizyon=takvim/haber)
+- Placeholder sayfalar e-posta toplamaz, sadelik + kayıt yönlendirmesi
+
+### Takıldığım yerler
+- Dosya adını .txs yazdım (geçmişteki hata tekrarı) → .tsx düzelttik
+- Terminal 404 hatasını yanlış anladım (aslında sadece test tıklaması) — hata mesajlarını okumaya alışacağım
+- Uzun aradan sonra sunucu takıldı → node_modules + .next silip npm install ile çözdüm
+
+### Sonraki adım
+Modül 3 — Supabase ve Veritabanı: Kayıt/giriş sistemi, kullanıcı tablosu, ilk gerçek veri

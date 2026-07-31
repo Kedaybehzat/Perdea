@@ -1,11 +1,19 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function Header() {
   return (
     <header className="bg-white border-b border-stone-200 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="text-2xl font-bold text-emerald-700">
-          Perdea
+        <Link href="/" className="flex items-center gap-2">
+          <Image
+            src="/logo.png"
+            alt="Perdea logosu"
+            width={36}
+            height={36}
+            className="w-9 h-9"
+          />
+          <span className="text-2xl font-bold text-emerald-700">Perdea</span>
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">

@@ -99,5 +99,7 @@ Modül 1 — Next.js Temelleri: React'in mantığını öğrenme, ilk Next.js pr
 - Terminal 404 hatasını yanlış anladım (aslında sadece test tıklaması) — hata mesajlarını okumaya alışacağım
 - Uzun aradan sonra sunucu takıldı → node_modules + .next silip npm install ile çözdüm
 
-### Sonraki adım
-Modül 3 — Supabase ve Veritabanı: Kayıt/giriş sistemi, kullanıcı tablosu, ilk gerçek veri
+### Modül 3
+
+Modül 3 — Görev 1-2 (1 Ağustos): Supabase projesi kuruldu (Frankfurt, Free). schema.sql canlıya basıldı: 3 tablo + RLS 3 tabloda açık + 10 policy. users.id → auth.users(id) bağlandı. RLS öğrenildi: using (mevcut satır) vs with check (yeni değer), insert→with check, delete→using, update→ikisi. users'ta sahiplik sütunu id, favorites/ratings'te user_id.
+Sırada: supabase-js client + .env.local, lib/ veri katmanı, /kayit ve /giris auth formları.

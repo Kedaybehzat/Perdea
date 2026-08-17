@@ -103,3 +103,12 @@ Modül 1 — Next.js Temelleri: React'in mantığını öğrenme, ilk Next.js pr
 
 Modül 3 — Görev 1-2 (1 Ağustos): Supabase projesi kuruldu (Frankfurt, Free). schema.sql canlıya basıldı: 3 tablo + RLS 3 tabloda açık + 10 policy. users.id → auth.users(id) bağlandı. RLS öğrenildi: using (mevcut satır) vs with check (yeni değer), insert→with check, delete→using, update→ikisi. users'ta sahiplik sütunu id, favorites/ratings'te user_id.
 Sırada: supabase-js client + .env.local, lib/ veri katmanı, /kayit ve /giris auth formları.
+
+Modül 3 — Görev 3-4: Auth altyapısı + Kayıt formu (17 Ağustos)
+
+@supabase/ssr kuruldu. lib/supabase/ altında browser client (client.ts), server client (server.ts), middleware (middleware.ts) yazıldı. Kök middleware.ts → codemod ile proxy.ts'e taşındı (Next 16 değişikliği).
+Server action app/kayit/actions.ts: 2 adımlı kayıt → auth.signUp + users tablosuna profil insert (id: data.user.id, username). Server-side doğrulama lib/validation.ts'ten (?? zinciriyle). Username çakışması 23505 koduyla yakalanıp güzel mesaja çevrildi.
+Form app/kayit/: server component page.tsx (searchParams'tan hata okur) + client component KayitFormu.tsx (göz ikonu, passwordConfirm, hata kutusu).
+Supabase: "Confirm email" test için KAPATILDI (canlıdan önce tekrar açılacak + email doğrulama akışı kurulacak).
+Öğrenilenler: using vs with check, cookie/session mantığı, client vs server component, server action, hydration uyarısı (Bitdefender kaynaklı, zararsız).
+Sırada: /giris (login) sayfası — kayıtın ikizi, signInWithPassword. Sonra: Header butonlarını bağlama, giriş sonrası "kim girmiş" gösterimi.

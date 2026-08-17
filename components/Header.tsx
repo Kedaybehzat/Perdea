@@ -1,7 +1,12 @@
 import Link from "next/link";
 import Image from "next/image";
+import { cikisYap } from "@/app/auth/actions";
+import { createClient } from "@/lib/supabase/server";
 
-export default function Header() {
+
+export default async function Header() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
   return (
     <header className="bg-white border-b border-stone-200 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
@@ -31,19 +36,40 @@ export default function Header() {
           </Link>
         </nav>
 
-        <div className="flex items-center gap-3">
-          <Link
-            href="/giris"
-            className="text-stone-700 hover:text-emerald-700 transition-colors hidden sm:block"
-          >
-            Giriş
-          </Link>
-          <Link
-            href="/kayit"
-            className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-medium"
-          >
-            Kayıt Ol
-          </Link>
+       <div className="flex items-center gap-3">
+          {user ? (
+            <>
+              <Link
+                href="/profil"
+                className="text-stone-700 hover:text-emerald-700 transition-colors hidden sm:block"
+              >
+                Profil
+              </Link>
+              <form action={cikisYap}>
+                <button
+                  type="submit"
+                  className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-medium"
+                >
+                  Çıkış Yap
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <Link
+                href="/giris"
+                className="text-stone-700 hover:text-emerald-700 transition-colors hidden sm:block"
+              >
+                Giriş
+              </Link>
+              <Link
+                href="/kayit"
+                className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors font-medium"
+              >
+                Kayıt Ol
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>

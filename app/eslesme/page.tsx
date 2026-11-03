@@ -5,6 +5,11 @@ import { createClient } from "@/lib/supabase/server";
 import { enUygunEslesmeler } from "@/lib/eslesme";
 import { yapimlariIdyeGoreCek, posterUrl, tmdbHazirMi } from "@/lib/tmdb";
 
+export const metadata = {
+  title: "Eşleşmeler — Perdea",
+  description: "Zevkine en yakın profiller. Ortak favorilerine göre.",
+};
+
 export default async function EslesmeSayfasi() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

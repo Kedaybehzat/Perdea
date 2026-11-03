@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { MessageCircle, Heart, Plus, Flame, Tag, Clock } from "lucide-react";
 
+export const metadata = {
+  title: "Topluluk — Perdea",
+  description: "Sinefillerin konuştuğu yer. Film, dizi, anime — hepsi.",
+};
+
 type Post = {
   id: string;
   yazar: string;

@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+
+export const metadata = {
+  title: "Sohbetler — Perdea",
+  description: "Eşleştiğin kişilerle birebir sohbet.",
+};
 import {
   MessageCircle,
   Send,

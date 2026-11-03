@@ -1,5 +1,10 @@
 import { MessageSquareText, Plus, TrendingUp, Clock } from "lucide-react";
 
+export const metadata = {
+  title: "Başlıklar — Perdea",
+  description: "Film/dizi/anime başlıkları ve entry'ler — ekşi ile twitter'ın karışımı.",
+};
+
 type Entry = {
   yazar: string;
   yazarBas: string;

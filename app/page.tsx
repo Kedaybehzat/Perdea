@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Users, MessageCircle, Film, UserPlus, ListChecks, Heart } from "lucide-react";
+import { Users, MessageCircle, Film, UserPlus, ListChecks, Heart, Sparkles, Star } from "lucide-react";
 import KarsilamaKarti from "@/components/KarsilamaKarti";
 
 export default function Home() {
@@ -36,14 +36,9 @@ export default function Home() {
             </div>
           </div>
 
-          {/* SAĞ: görsel alanı — Rana'nın PNG'si gelince buraya <img> girecek.
-              Mobilde gizli (dekoratif), md üstünde görünür. */}
+          {/* SAĞ: eşleşme demo kartı — CSS ile Perdea'nın ne yaptığını gösterir. */}
           <div className="flex-1 hidden md:block">
-            <div className="w-full aspect-square bg-stone-100 border border-stone-200 rounded-2xl flex items-center justify-center text-stone-400 text-center px-6">
-              Görsel buraya gelecek
-              <br />
-              (poster + eşleşme kartı — Rana'nın PNG'si)
-            </div>
+            <EslesmeDemoKarti />
           </div>
         </div>
       </section>
@@ -150,5 +145,77 @@ export default function Home() {
         </div>
       </section>
     </main>
+  );
+}
+
+function EslesmeDemoKarti() {
+  return (
+    <div className="relative w-full aspect-square max-w-md mx-auto">
+      {/* Arka plan gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-emerald-50 via-stone-50 to-emerald-100 rounded-3xl" />
+
+      {/* Üst: kullanıcı başlıkları */}
+      <div className="absolute top-6 left-6 right-6 flex items-center justify-between">
+        <KullaniciMini bas="D" ad="Deniz" />
+        <div className="flex flex-col items-center">
+          <div className="bg-emerald-600 text-white text-xs font-bold px-2.5 py-1 rounded-full inline-flex items-center gap-1 shadow-md">
+            <Sparkles className="w-3 h-3" />
+            %87 uyum
+          </div>
+          <Heart className="w-4 h-4 text-rose-500 fill-rose-500 mt-1.5" />
+        </div>
+        <KullaniciMini bas="M" ad="Mert" />
+      </div>
+
+      {/* Orta: ortak favori posterleri (CSS kartlar) */}
+      <div className="absolute inset-x-6 top-28">
+        <p className="text-xs text-stone-500 uppercase tracking-wider mb-2 text-center">
+          Ortak favoriler
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          <PosterMini renk="from-rose-400 to-rose-600" ad="Kıpkırmızı" />
+          <PosterMini renk="from-slate-700 to-slate-900" ad="Gece Vardiyası" />
+          <PosterMini renk="from-amber-400 to-amber-600" ad="Rüzgarın Hatıraları" />
+        </div>
+      </div>
+
+      {/* Alt: eşleşme çubukları */}
+      <div className="absolute bottom-6 left-6 right-6 bg-white rounded-2xl p-4 shadow-sm border border-stone-200">
+        <div className="flex items-center justify-between text-xs mb-2">
+          <span className="text-stone-500">Zevk uyumu</span>
+          <span className="text-emerald-700 font-semibold">%87</span>
+        </div>
+        <div className="h-1.5 bg-stone-100 rounded-full overflow-hidden">
+          <div className="h-full bg-emerald-500 rounded-full" style={{ width: "87%" }} />
+        </div>
+        <div className="flex items-center gap-1.5 mt-3 text-xs text-stone-500">
+          <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
+          12 ortak yapım · 3 ortak tür
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function KullaniciMini({ bas, ad }: { bas: string; ad: string }) {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="w-14 h-14 rounded-full bg-white border-2 border-emerald-200 flex items-center justify-center text-emerald-700 font-bold text-xl shadow-sm">
+        {bas}
+      </div>
+      <p className="text-xs text-stone-700 font-medium mt-1.5">{ad}</p>
+    </div>
+  );
+}
+
+function PosterMini({ renk, ad }: { renk: string; ad: string }) {
+  return (
+    <div
+      className={`aspect-[2/3] rounded-lg bg-gradient-to-br ${renk} p-2 flex items-end shadow-sm`}
+    >
+      <p className="text-white text-[9px] font-semibold leading-tight line-clamp-2">
+        {ad}
+      </p>
+    </div>
   );
 }

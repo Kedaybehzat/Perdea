@@ -8,6 +8,11 @@ import {
   type TmdbYapim,
 } from "@/lib/tmdb";
 
+export const metadata = {
+  title: "Vizyon — Perdea",
+  description: "Türkiye vizyonundaki filmler ve yakında gelecekler.",
+};
+
 export default async function VizyonSayfasi() {
   if (!tmdbHazirMi()) {
     return <TmdbKurulumu />;

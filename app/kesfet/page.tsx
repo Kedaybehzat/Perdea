@@ -4,6 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { trendYapimlar, yapimAra, posterUrl, tmdbHazirMi } from "@/lib/tmdb";
 import YapimKart from "./YapimKart";
 
+export const metadata = {
+  title: "Keşfet — Perdea",
+  description: "Haftanın öne çıkan filmleri ve dizileri. Favoriye ekle, puan ver.",
+};
+
 type Props = {
   searchParams: Promise<{ q?: string; tur?: "film" | "dizi" | "hepsi" }>;
 };

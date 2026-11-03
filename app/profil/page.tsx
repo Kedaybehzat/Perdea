@@ -4,6 +4,11 @@ import { createClient } from "@/lib/supabase/server";
 import { Calendar, Pencil, Star, Heart, Film, Users, Flame } from "lucide-react";
 import { yapimlariIdyeGoreCek, posterUrl, tmdbHazirMi } from "@/lib/tmdb";
 
+export const metadata = {
+  title: "Profilim — Perdea",
+  description: "Favori vitrini, puanladıkların ve profil özetin.",
+};
+
 export default async function ProfilSayfasi() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();

@@ -2,6 +2,11 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Gamepad2, Sparkles, Check, X, HelpCircle, Film, Trophy } from "lucide-react";
 
+export const metadata = {
+  title: "Karakter Oyunu — Perdea",
+  description: "Ortak favori yapımdan karakter seç, diğeri 20 soruyla bulmaya çalışsın.",
+};
+
 type Soru = {
   no: number;
   soru: string;

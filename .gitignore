@@ -15,7 +15,10 @@
 
 # next.js
 /.next/
+/.next
 /out/
+# iCloud yedek
+*.zip
 
 # production
 /build

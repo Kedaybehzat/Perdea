@@ -26,7 +26,10 @@ ai_docs/
    ├─ route-koruma.md
    ├─ nav-sayfalari.md
    ├─ favori-puan.md
-   └─ eslesme.md
+   ├─ eslesme.md
+   ├─ baslik.md          ← ekşi/twitter tarzı başlık + entry
+   ├─ ozel-chat.md       ← birebir mesajlaşma (friendships + conversations + messages)
+   └─ karakter-oyunu.md  ← "ben kimim?" oyunu (sohbetin üstüne biner)
 ```
 
 ## Hangi iş → hangi dosya
@@ -37,6 +40,9 @@ ai_docs/
 | Boş nav sayfaları (keşfet/eşleş/topluluk/vizyon) | `core/durum.md` + `gorevler/nav-sayfalari.md` |
 | Favori ekleme / puan verme | `core/durum.md` + `gorevler/favori-puan.md` + `core/sema.md` |
 | Eşleşme algoritması | `core/durum.md` + `gorevler/eslesme.md` + `core/sema.md` |
+| Başlık + entry (ekşi/twitter) | `core/durum.md` + `gorevler/baslik.md` + `core/sema.md` |
+| Birebir sohbet | `core/durum.md` + `gorevler/ozel-chat.md` + `core/sema.md` |
+| Karakter / "ben kimim?" oyunu | `core/durum.md` + `gorevler/karakter-oyunu.md` + `gorevler/ozel-chat.md` |
 | Yeni kod / yapıyı öğrenme | `core/mimari.md` |
 | Bir şey patladı / garip hata | `core/tuzaklar.md` |
 

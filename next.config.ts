@@ -1,7 +1,7 @@
 import type { NextConfig } from "next";
 
-const nextConfig: NextConfig = {
-  /* config options here */
-};
+// iCloud sync sorunu `.next` sembolik link üzerinden çözüldü — bkz
+// `ai_docs/core/tuzaklar.md` ("Desktop iCloud sync"). Config temiz.
+const nextConfig: NextConfig = {};
 
 export default nextConfig;

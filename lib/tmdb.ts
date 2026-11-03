@@ -87,6 +87,22 @@ export async function trendYapimlar(kategori: "film" | "dizi" | "hepsi" = "hepsi
   return data.results.map((r) => yapimdenCevir(r, kategori === "dizi" ? "dizi" : "film"));
 }
 
+export async function vizyondakiFilmler(): Promise<TmdbYapim[]> {
+  const data = await tmdbFetch<TmdbTrendingSonuc>("/movie/now_playing", {
+    region: "TR",
+  });
+  if (!data) return [];
+  return data.results.map((r) => yapimdenCevir({ ...r, media_type: "movie" }, "film"));
+}
+
+export async function yakindaFilmler(): Promise<TmdbYapim[]> {
+  const data = await tmdbFetch<TmdbTrendingSonuc>("/movie/upcoming", {
+    region: "TR",
+  });
+  if (!data) return [];
+  return data.results.map((r) => yapimdenCevir({ ...r, media_type: "movie" }, "film"));
+}
+
 export async function yapimAra(sorgu: string): Promise<TmdbYapim[]> {
   if (!sorgu.trim()) return [];
   const data = await tmdbFetch<TmdbTrendingSonuc>("/search/multi", { query: sorgu });

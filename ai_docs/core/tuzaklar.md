@@ -1,5 +1,29 @@
 # Tuzaklar — bir şey patlayınca buraya bak
 
+## ⚠️ Supabase projesi inaktif → DNS bile çözülmez
+Free tier proje haftalarca kullanılmazsa önce duraklatılır, uzun süre sonra silinir. Belirti: `getUser()` request'inde dev server sonsuza dek takılır, sayfa açılmaz; başka terminalde:
+```bash
+curl -I https://<proje_id>.supabase.co
+# → curl: (6) Could not resolve host
+```
+Çözüm: Supabase dashboard'a gir → proje paused ise "Restore", silinmişse yeni proje aç + `docs/schema.sql`'i SQL Editor'de koştur + `.env.local`'daki URL/anon key'i yenile + `npm run dev`'i yeniden başlat. Bu çözülmeden `/` bile açılmaz çünkü `proxy.ts` her request'te `updateSession → getUser` çağırıyor.
+
+## ⚠️ Desktop iCloud sync → "Slow filesystem detected"
+Proje `~/Desktop/...` altında ve Desktop iCloud'a senkron. `.next/dev` her yazımda iCloud sync bekler → Next uyarır:
+```
+⚠ Slow filesystem detected. The benchmark took 32395ms.
+```
+**distDir denemedim yapma:** Next `distDir`'ın proje dışına çıkmasına izin vermiyor; absolute path verince klasörü proje içine kopyalayıp `Users/ayberkalkan/.cache/...` diye nested dizin açıyor.
+**Çözüm (uygulandı):** `.next`'i iCloud dışına symlink.
+```bash
+mkdir -p ~/.cache/perdea2-next-dev
+ln -sfn ~/.cache/perdea2-next-dev .next
+```
+Her clone'dan sonra tekrar yapman gerekir (`.next` gitignored). Kalıcı çözüm: projeyi `~/dev/perdea2` gibi iCloud'suz bir yere taşı.
+
+## ⚠️ next/font/google Türkiye'den bazen takılır
+`layout.tsx`'te `next/font/google` ile Geist çekilince, Türkiye'deki bazı ağlarda fonts.googleapis.com'a request yapılamıyor → ilk sayfa render'ı sonsuza kadar bekler. Çözüm (uygulandı): Geist kaldırıldı, sistem font stack'ine geçildi (globals.css). Geist'i geri istersen `next/font/local` + Geist'in ttf/woff dosyalarını `public/fonts/`'a koyma yoluna gidilebilir.
+
 ## ⚠️ EN KRİTİK: "Confirm email" şu an KAPALI
 Supabase → Auth → Sign In/Providers → Email → "Confirm email" test için kapalı.
 **Açılırsa 2 adımlı kayıt BOZULUR:** `signUp` sonrası kullanıcı onaylayana kadar session kurulmaz → `auth.uid()` null → `users` insert'i RLS'e takılır ("new row violates row-level security policy").

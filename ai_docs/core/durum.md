@@ -1,37 +1,51 @@
 # Durum — ne bitti, ne kaldı
 
-Son güncelleme: 2026-11-04. **İş bitince bu dosyayı güncelle.**
+Son güncelleme: 2026-11-04 (gece). **İş bitince bu dosyayı güncelle.**
 
-## Bitti ✅ (Modül 3 — Auth, tamamen çalışıyor, push'lu)
-- Supabase kurulu: Frankfurt `eu-central-1`, Free, proje id `qryjifkmxplsjenamnhp`.
-- Şema + RLS canlıda (3 tablo, 10 policy) → `core/sema.md`.
-- SSR auth: browser client + server client + proxy (`lib/supabase/`, `proxy.ts`).
-- `/kayit` — 2 adımlı (auth.signUp + `users` insert), doğrulama, şifre tekrar, hata kutusu, username çakışma mesajı.
-- `/giris` — `signInWithPassword`, doğrulama, hata kutusu.
-- Çıkış — `app/auth/actions.ts` → `cikisYap` (signOut).
-- `Header` — session'a göre dinamik (girişli: Profil+Çıkış / değil: Giriş+Kayıt).
+## 🚨 KRİTİK: Supabase projesi şu an ulaşılamaz
+`qryjifkmxplsjenamnhp.supabase.co` DNS'te çözülmüyor. Free tier 2-3 ay inaktiften sonra proje silinmiş olabilir. Supabase bağlanana kadar `/kayit`, `/giris`, `/profil`, `/eslesme`, hatta `/` bile açılmaz (proxy her request'te `getUser` çağırıyor). Detaylı çözüm: `core/tuzaklar.md` ilk madde.
 
-## Bitti ✅ (Modül 4 — Profil, eşleşme, keşfet, favori/puan — push'lu)
-- **Profil** (`app/profil/page.tsx`) — kapak + avatar + bio + chip, favori vitrini (ilk 4), puanladıklarım grid, sağda profil özeti (favori sayısı / puan sayısı / ortalama). Girişsizse `/giris`'e redirect.
-- **Profili Düzenle** (`app/profil/duzenle/`) — ayrı sayfa + client form (`DuzenleFormu.tsx`) + `app/profil/actions.ts::profilGuncelle`. `display_name`, `bio`, `avatar_url` güncellenebilir; username sabit. Hata `?hata=` ile forma döner.
-- **Keşfet** (`app/kesfet/page.tsx`) — TMDB `trending/week` + `search/multi` (dil `tr-TR`), film/dizi/hepsi filtresi, arama. `YapimKart.tsx` (client) içinden favori toggle + 1–10 puan picker, `useTransition` + optimistic UI. TMDB key yoksa güzel "kurulum gerekiyor" ekranı.
-- **Eşleşme** (`app/eslesme/page.tsx`) — korumalı. MVP algoritması `lib/eslesme.ts::enUygunEslesmeler`: ortak favori sayısı + ortak filmlerde puan farkı yakınlığı. Ana aday kartı + "Sıradaki olası eşleşmeler" row + boş durum (favori yok / aday yok) ekranları. Beğen/Geç butonları şimdilik stateless (ileride `matches` tablosu).
-- **lib/** — `tmdb.ts` (trend/arama/detay/id-batch + hazırMı), `favori.ts` (durum/ekle/sil/toggle + id listesi), `puan.ts` (upsert/sil + liste), `eslesme.ts` (algoritma).
-- **Server actions** — `app/kesfet/actions.ts`: `favoriDegistir`, `puanKaydet`, `puanTemizle` (hepsi `revalidatePath` çağrıyor).
-- **Route koruma** — `/profil`, `/profil/duzenle`, `/eslesme` sayfa içi `getUser` + `redirect('/giris')`. Yöntem 1 (sayfa-bazlı), ileride çoğalınca merkezi'ye geçilebilir.
-- **Nav sayfaları** — `/topluluk`, `/vizyon` hâlâ `YakindaSayfasi` ile. `/kesfet` ve `/eslesme` yukarıdaki gibi dolu.
+## Bitti ✅
+### Modül 3 — Auth (eski, çalışıyordu)
+- Supabase şeması + RLS canlıya alındı (`core/sema.md`).
+- SSR auth: proxy + server/browser client (`lib/supabase/`).
+- `/kayit`, `/giris`, çıkış, Header session'a göre dinamik.
 
-## Kalan işler
-1. [ ] **TMDB API key** — `.env.local`'a `TMDB_API_KEY=...` ekle (Keşfet ve poster vitrinleri bunsuz "yakında" düşer).
-2. [ ] **Beğen/Geç kalıcı hale getir** — `matches` tablosu + RLS, `/eslesme`'de aksiyon kaydet, aynı adayı tekrar gösterme.
-3. [ ] **Topluluk** gerçek içerik (post tablosu + feed). UI mockup var (`UI_IMG/topluluk.png`).
-4. [ ] **Vizyon** — "vizyondaki filmler" (TMDB `now_playing`) mi, "proje vizyonu" sayfası mı? Karar.
-5. [ ] **Canlı öncesi:** "Confirm email"i aç + akışı uyarla, Node 22'ye çık → `core/tuzaklar.md`.
-6. [ ] (Opsiyonel) Avatar yükleme için Supabase Storage.
+### Modül 4 — UI ve TMDB entegrasyonu
+- **Profil** (`app/profil/page.tsx` + `/duzenle`) — kapak+avatar, bio, favori vitrini, puanladıklarım, profil özeti sidebar; display_name/bio/avatar_url düzenleme.
+- **Keşfet** (`app/kesfet/`) — TMDB trending + search, film/dizi filtresi, favori toggle + 1-10 puan picker (`YapimKart`, optimistic UI).
+- **Eşleşme** (`app/eslesme/page.tsx`) — korumalı; `lib/eslesme.ts` ortak favori + puan yakınlığı skoru, ana aday + sıradaki adaylar + boş durum.
+- **Vizyon** (`app/vizyon/page.tsx`) — TMDB `now_playing` + `upcoming` TR bölgesi, poster grid.
+- **Topluluk** (`app/topluluk/page.tsx`) — mockup feed + Gündemde + Popüler Etiketler sidebar.
+- **Başlık** (`app/baslik/page.tsx`) — ekşi/twitter tarzı başlık listesi, her başlığın altında son entry. UI mockup; backend `gorevler/baslik.md`'de spec'li.
+- **Sohbet** (`app/sohbet/page.tsx`) — birebir mesajlaşma UI mockup'ı. Spec: `gorevler/ozel-chat.md`.
+- **Karakter Oyunu** (`app/oyun/page.tsx`) — "ben kimim?" 20-soru oyunu UI mockup'ı. Spec: `gorevler/karakter-oyunu.md`.
+- **Header** — responsive, mobil hamburger menü (`components/MobilMenu.tsx`).
+- **lib/** — `tmdb.ts`, `favori.ts`, `puan.ts`, `eslesme.ts`.
+- **Font tuzakları** — `next/font/google` kaldırıldı, sistem font'a geçildi (Türkiye'den Google Fonts intermittent).
+- **next.config.ts** — `distDir` iCloud dışına alındı (`~/.cache/perdea2-next`).
+
+## Kalan işler (sıralı)
+### Önce Supabase'i canlı tut (blocker — bunlar çözülmeden hiçbiri çalışmaz)
+1. [ ] **Supabase projeyi geri aç.** Dashboard → Restore (paused ise) ya da yeni proje + `docs/schema.sql` yeniden çalıştır + `.env.local`'daki URL/anon key'i yenile.
+2. [ ] **(Opsiyonel) Node 22'ye geç** — Supabase 20'de uyarı veriyor.
+
+### Backend bekleyen UI mockup'ları (spec'leri hazır)
+3. [ ] **Başlık + entry** → `gorevler/baslik.md` — basliklar/entryler/entry_begeni/baslik_takip tabloları + RLS + lib + actions.
+4. [ ] **Özel chat** → `gorevler/ozel-chat.md` — friendships/conversations/messages tabloları + RLS + Realtime subscribe + lib + actions.
+5. [ ] **Karakter oyunu** → `gorevler/karakter-oyunu.md` — games/game_secrets/game_moves tabloları + RLS + lib + actions. Sohbet önkoşul.
+6. [ ] **Beğen/Geç kalıcı hale getir** (`/eslesme`) — `matches` tablosu + RLS, aynı adayı tekrar gösterme, karşılıklı beğen = eşleşme bildirim.
+
+### Küçük işler
+7. [ ] **TMDB API key** — `.env.local`'da zaten var (`a95b...`). Vizyon/Keşfet çalışıyor.
+8. [ ] **Topluluk gerçek içerik** (post tablosu + feed) — şu an mockup.
+9. [ ] **Avatar yükleme** — Supabase Storage.
+10. [ ] **Canlı öncesi:** "Confirm email"i aç, akışı uyarla → `core/tuzaklar.md`.
 
 ## Sonra
 - Mobil versiyon (tüm web bitince).
 
 ## Notlar
-- Repo canlıda `Kedaybehzat/Perdea.git` (perdea2 değil) — remote adı; klasör adı `perdea2` kaldı.
-- `movie_id integer` TMDB id'si. Dizi/film ayrımı şu an `media_type` ile çekiliyor; favori/rating tabloları tek sütun (`movie_id`) tuttuğu için şimdilik "TMDB id" olarak kabul ediliyor. Dizileri ayrı tablo/kolonla ayırmak isteyecek olursak `sema.md` güncellenir.
+- Repo canlıda `Kedaybehzat/Perdea.git` (perdea2 değil).
+- `movie_id integer` TMDB id'si; favori/rating tabloları tek sütun tuttuğu için şimdilik film/dizi karışık.
+- Mockup'lı sayfalarda (`/topluluk`, `/baslik`, `/sohbet`, `/oyun`) sarı "Önizleme" kutusu var — spec dosyasına link.

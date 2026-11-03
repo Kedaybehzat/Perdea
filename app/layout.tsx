@@ -4,8 +4,28 @@ import Footer from "@/components/Footer";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Perdea — Zevkini paylaş, ruh eşini bul",
-  description: "Film, dizi ve anime severler için sosyal eşleşme ve topluluk platformu.",
+  title: {
+    default: "Perdea — Zevkini paylaş, ruh eşini bul",
+    template: "%s",
+  },
+  description:
+    "Film, dizi ve anime severler için Türkçe sosyal eşleşme ve topluluk platformu. Zevkine göre insanlarla tanış, birlikte keşfet.",
+  openGraph: {
+    title: "Perdea — Zevkini paylaş, ruh eşini bul",
+    description:
+      "Film, dizi ve anime severler için Türkçe sosyal eşleşme ve topluluk platformu.",
+    type: "website",
+    locale: "tr_TR",
+    siteName: "Perdea",
+    images: [{ url: "/logo.png", width: 512, height: 512, alt: "Perdea" }],
+  },
+  twitter: {
+    card: "summary",
+    title: "Perdea — Zevkini paylaş, ruh eşini bul",
+    description:
+      "Film, dizi ve anime severler için Türkçe sosyal eşleşme platformu.",
+    images: ["/logo.png"],
+  },
 };
 
 export default function RootLayout({

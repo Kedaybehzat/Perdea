@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { cikisYap } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/server";
+import { headers } from "next/headers";
 import MobilMenu from "./MobilMenu";
 
 const navLinkleri = [
@@ -11,9 +12,23 @@ const navLinkleri = [
   { href: "/vizyon", etiket: "Vizyon" },
 ];
 
+async function aktifYol(): Promise<string> {
+  // Server component'ten pathname yok — proxy'nin sized header'ı okuyabilir.
+  // Yoksa boş döneriz (vurgusuz).
+  try {
+    const h = await headers();
+    return h.get("x-pathname") ?? "";
+  } catch {
+    return "";
+  }
+}
+
 export default async function Header() {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const [{ data: { user } }, yol] = await Promise.all([
+    supabase.auth.getUser(),
+    aktifYol(),
+  ]);
 
   return (
     <header className="bg-white border-b border-stone-200 sticky top-0 z-50">
@@ -30,15 +45,22 @@ export default async function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
-          {navLinkleri.map((l) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              className="text-stone-700 hover:text-emerald-700 transition-colors"
-            >
-              {l.etiket}
-            </Link>
-          ))}
+          {navLinkleri.map((l) => {
+            const aktif = yol === l.href || yol.startsWith(l.href + "/");
+            return (
+              <Link
+                key={l.href}
+                href={l.href}
+                className={`transition-colors ${
+                  aktif
+                    ? "text-emerald-700 font-semibold"
+                    : "text-stone-700 hover:text-emerald-700"
+                }`}
+              >
+                {l.etiket}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-3">
@@ -46,7 +68,11 @@ export default async function Header() {
             <>
               <Link
                 href="/profil"
-                className="text-stone-700 hover:text-emerald-700 transition-colors hidden sm:block"
+                className={`transition-colors hidden sm:block ${
+                  yol.startsWith("/profil")
+                    ? "text-emerald-700 font-semibold"
+                    : "text-stone-700 hover:text-emerald-700"
+                }`}
               >
                 Profil
               </Link>

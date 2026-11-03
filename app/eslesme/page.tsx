@@ -103,10 +103,23 @@ function AdayKarti({
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
-              <h2 className="text-2xl font-bold text-stone-900">{ad}</h2>
+              {aday.username ? (
+                <Link
+                  href={`/u/${aday.username}`}
+                  className="text-2xl font-bold text-stone-900 hover:text-emerald-700 transition-colors"
+                >
+                  {ad}
+                </Link>
+              ) : (
+                <h2 className="text-2xl font-bold text-stone-900">{ad}</h2>
+              )}
               <UyumRozeti yuzde={aday.uyumYuzdesi} />
             </div>
-            {aday.username && <p className="text-sm text-stone-500">@{aday.username}</p>}
+            {aday.username && (
+              <Link href={`/u/${aday.username}`} className="text-sm text-stone-500 hover:text-emerald-700">
+                @{aday.username}
+              </Link>
+            )}
             {aday.bio && (
               <p className="text-sm text-stone-600 mt-2 leading-relaxed">{aday.bio}</p>
             )}
@@ -218,8 +231,22 @@ function KucukAdayKarti({
 }) {
   const ad = aday.displayName || aday.username || "Üye";
   const bastHarf = ad.charAt(0).toUpperCase();
+  const hrefVar = Boolean(aday.username);
+  const Wrapper = ({ children }: { children: React.ReactNode }) =>
+    hrefVar ? (
+      <Link
+        href={`/u/${aday.username}`}
+        className="block bg-white border border-stone-200 rounded-xl p-3 text-center hover:shadow-md hover:border-emerald-300 transition-all"
+      >
+        {children}
+      </Link>
+    ) : (
+      <div className="bg-white border border-stone-200 rounded-xl p-3 text-center">
+        {children}
+      </div>
+    );
   return (
-    <div className="bg-white border border-stone-200 rounded-xl p-3 text-center hover:shadow-md transition-shadow">
+    <Wrapper>
       {aday.avatarUrl ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
@@ -234,7 +261,7 @@ function KucukAdayKarti({
       )}
       <p className="mt-2 text-sm font-medium text-stone-900 truncate">{ad}</p>
       <p className="text-xs text-emerald-700 font-semibold">%{aday.uyumYuzdesi} uyum</p>
-    </div>
+    </Wrapper>
   );
 }
 

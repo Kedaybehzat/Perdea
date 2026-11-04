@@ -1,9 +1,9 @@
 # Durum — ne bitti, ne kaldı
 
-Son güncelleme: 2026-11-04 (gece). **İş bitince bu dosyayı güncelle.**
+Son güncelleme: 2026-11-04 (sabah). **İş bitince bu dosyayı güncelle.**
 
-## 🚨 KRİTİK: Supabase projesi şu an ulaşılamaz
-`qryjifkmxplsjenamnhp.supabase.co` DNS'te çözülmüyor. Free tier 2-3 ay inaktiften sonra proje silinmiş olabilir. Supabase bağlanana kadar `/kayit`, `/giris`, `/profil`, `/eslesme`, hatta `/` bile açılmaz (proxy her request'te `getUser` çağırıyor). Detaylı çözüm: `core/tuzaklar.md` ilk madde.
+## ✅ Proje artık `~/dev/perdea2`'de
+Eski `~/Desktop/projects/perdea2` iCloud sync tuzağı yüzünden taşındı (`tuzaklar.md`). Yeni Supabase projesiyle (`yownpangnyenjsozrguw.supabase.co`) aktif, dev sorunsuz, tüm sayfalar (`/`, `/kesfet`, `/vizyon`, `/baslik`, `/sohbet`, `/oyun`, `/profil`, `/eslesme`) 200 dönüyor. Eski Desktop klasörü dokunulmadan duruyor — yeni konum çalışırken sil.
 
 ## Bitti ✅
 ### Modül 3 — Auth (eski, çalışıyordu)

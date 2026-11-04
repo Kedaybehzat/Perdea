@@ -8,20 +8,18 @@ curl -I https://<proje_id>.supabase.co
 ```
 Çözüm: Supabase dashboard'a gir → proje paused ise "Restore", silinmişse yeni proje aç + `docs/schema.sql`'i SQL Editor'de koştur + `.env.local`'daki URL/anon key'i yenile + `npm run dev`'i yeniden başlat. Bu çözülmeden `/` bile açılmaz çünkü `proxy.ts` her request'te `updateSession → getUser` çağırıyor.
 
-## ⚠️ Desktop iCloud sync → "Slow filesystem detected"
-Proje `~/Desktop/...` altında ve Desktop iCloud'a senkron. `.next/dev` her yazımda iCloud sync bekler → Next uyarır:
-```
-⚠ Slow filesystem detected. The benchmark took 32395ms.
-```
-**distDir denemedim yapma:** Next `distDir`'ın proje dışına çıkmasına izin vermiyor; absolute path verince klasörü proje içine kopyalayıp `Users/ayberkalkan/.cache/...` diye nested dizin açıyor.
-**İlk deneme (yanlış — yapma):** `.next`'i `~/.cache/perdea2-next-dev`'e symlink'ledim. Turbopack chunk'larda absolute path baked, Node modül çözümü oradan `~/node_modules/next`'i aradı, bulamadı → `Failed to load external module next/dist/build/adapter/setup-node-env.external.js`.
-**Çözüm (uygulandı):** iCloud'un `.nosync` uzantılı klasörleri sync etmediğinden yararlan — `.next`'i proje içindeki `.next.nosync`'e symlink. Proje içinde kaldığı için modül çözümü doğru node_modules'u bulur.
+## ⚠️ Desktop iCloud sync → "Slow filesystem detected" [KALICI ÇÖZÜLDÜ 2026-11-04]
+**Proje artık `~/dev/perdea2`'de (iCloud'suz).** Eski `~/Desktop/projects/perdea2` hâlâ orada ama kullanma. Şu an dev sorunsuz, config temiz (`.next` default konumunda).
+
+Bunu bir kez çekip bir de bakma, denediğimiz 3 yanlış çözüm (bir daha yapma):
+- `distDir` absolute path: Next proje dışına izin vermiyor, `Users/ayberkalkan/.cache/...` diye nested klasör açıyor.
+- `.next` → `~/.cache/perdea2-next-dev` symlink: Turbopack chunk'larda cache'in gerçek yolunu baked, Node modül çözümü oradan `~/node_modules/next` arayıp bulamadı → `Failed to load external module .../setup-node-env.external.js`.
+- `.next` → `.next.nosync` (proje içi) symlink: iCloud'un `.nosync` uzantısını sync etmemesi kuralı; çalıştı ama projeyi taşımak daha temiz.
+
+Eski Desktop klasörünü güvende hissedince sil:
 ```bash
-rm -rf .next
-mkdir .next.nosync
-ln -sfn .next.nosync .next
+rm -rf ~/Desktop/projects/perdea2
 ```
-Her clone'dan sonra tekrar yapman gerekir (ikisi de gitignored). Kalıcı çözüm: projeyi `~/dev/perdea2` gibi iCloud'suz bir yere taşı.
 
 ## ⚠️ next/font/google Türkiye'den bazen takılır
 `layout.tsx`'te `next/font/google` ile Geist çekilince, Türkiye'deki bazı ağlarda fonts.googleapis.com'a request yapılamıyor → ilk sayfa render'ı sonsuza kadar bekler. Çözüm (uygulandı): Geist kaldırıldı, sistem font stack'ine geçildi (globals.css). Geist'i geri istersen `next/font/local` + Geist'in ttf/woff dosyalarını `public/fonts/`'a koyma yoluna gidilebilir.

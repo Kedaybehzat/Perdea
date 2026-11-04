@@ -14,12 +14,14 @@ Proje `~/Desktop/...` altında ve Desktop iCloud'a senkron. `.next/dev` her yaz�
 ⚠ Slow filesystem detected. The benchmark took 32395ms.
 ```
 **distDir denemedim yapma:** Next `distDir`'ın proje dışına çıkmasına izin vermiyor; absolute path verince klasörü proje içine kopyalayıp `Users/ayberkalkan/.cache/...` diye nested dizin açıyor.
-**Çözüm (uygulandı):** `.next`'i iCloud dışına symlink.
+**İlk deneme (yanlış — yapma):** `.next`'i `~/.cache/perdea2-next-dev`'e symlink'ledim. Turbopack chunk'larda absolute path baked, Node modül çözümü oradan `~/node_modules/next`'i aradı, bulamadı → `Failed to load external module next/dist/build/adapter/setup-node-env.external.js`.
+**Çözüm (uygulandı):** iCloud'un `.nosync` uzantılı klasörleri sync etmediğinden yararlan — `.next`'i proje içindeki `.next.nosync`'e symlink. Proje içinde kaldığı için modül çözümü doğru node_modules'u bulur.
 ```bash
-mkdir -p ~/.cache/perdea2-next-dev
-ln -sfn ~/.cache/perdea2-next-dev .next
+rm -rf .next
+mkdir .next.nosync
+ln -sfn .next.nosync .next
 ```
-Her clone'dan sonra tekrar yapman gerekir (`.next` gitignored). Kalıcı çözüm: projeyi `~/dev/perdea2` gibi iCloud'suz bir yere taşı.
+Her clone'dan sonra tekrar yapman gerekir (ikisi de gitignored). Kalıcı çözüm: projeyi `~/dev/perdea2` gibi iCloud'suz bir yere taşı.
 
 ## ⚠️ next/font/google Türkiye'den bazen takılır
 `layout.tsx`'te `next/font/google` ile Geist çekilince, Türkiye'deki bazı ağlarda fonts.googleapis.com'a request yapılamıyor → ilk sayfa render'ı sonsuza kadar bekler. Çözüm (uygulandı): Geist kaldırıldı, sistem font stack'ine geçildi (globals.css). Geist'i geri istersen `next/font/local` + Geist'in ttf/woff dosyalarını `public/fonts/`'a koyma yoluna gidilebilir.

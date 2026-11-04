@@ -1,7 +1,11 @@
 import type { NextConfig } from "next";
 
-// iCloud sync sorunu `.next` sembolik link üzerinden çözüldü — bkz
-// `ai_docs/core/tuzaklar.md` ("Desktop iCloud sync"). Config temiz.
-const nextConfig: NextConfig = {};
+// iCloud sync: `.next` → `.next.nosync` symlink (ai_docs/core/tuzaklar.md).
+// lucide-react dev compile çok yavaş — modüler import optimizasyonu.
+const nextConfig: NextConfig = {
+  experimental: {
+    optimizePackageImports: ["lucide-react"],
+  },
+};
 
 export default nextConfig;

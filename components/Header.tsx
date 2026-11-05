@@ -7,7 +7,8 @@ import MobilMenu from "./MobilMenu";
 const navLinkleri = [
   { href: "/kesfet", etiket: "Keşfet" },
   { href: "/eslesme", etiket: "Eşleş" },
-  { href: "/topluluk", etiket: "Topluluk" },
+  { href: "/baslik", etiket: "Başlıklar" },
+  { href: "/oyun", etiket: "Oyun" },
   { href: "/vizyon", etiket: "Vizyon" },
 ];
 

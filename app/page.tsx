@@ -1,8 +1,17 @@
 import Link from "next/link";
-import { Users, MessageCircle, Film, UserPlus, ListChecks, Heart, Sparkles, Star } from "lucide-react";
+import { Users, MessageCircle, Film, UserPlus, ListChecks, Heart, Sparkles, Star, Gamepad2, MessageSquareText, Clapperboard, Compass } from "lucide-react";
 import KarsilamaKarti from "@/components/KarsilamaKarti";
+import { createClient } from "@/lib/supabase/server";
+import { yapimlariIdyeGoreCek, posterUrl, tmdbHazirMi } from "@/lib/tmdb";
 
-export default function Home() {
+export default async function Home() {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (user) {
+    return <GirisliAnaSayfa userId={user.id} />;
+  }
+
   return (
     <main>
       {/* Hero Section — iki sütunlu: solda metin+butonlar, sağda görsel */}
@@ -217,5 +226,188 @@ function PosterMini({ renk, ad }: { renk: string; ad: string }) {
         {ad}
       </p>
     </div>
+  );
+}
+
+async function GirisliAnaSayfa({ userId }: { userId: string }) {
+  const supabase = await createClient();
+
+  const [{ data: profil }, { data: sonFavoriler }, { count: favoriSayisi }, { count: puanSayisi }] =
+    await Promise.all([
+      supabase.from("users").select("display_name, username").eq("id", userId).single(),
+      supabase
+        .from("favorites")
+        .select("movie_id, created_at")
+        .eq("user_id", userId)
+        .order("created_at", { ascending: false })
+        .limit(6),
+      supabase.from("favorites").select("id", { count: "exact", head: true }).eq("user_id", userId),
+      supabase.from("ratings").select("id", { count: "exact", head: true }).eq("user_id", userId),
+    ]);
+
+  const ad = profil?.display_name || profil?.username || "Hoş geldin";
+  const posterIdleri = (sonFavoriler ?? []).map((f) => f.movie_id);
+  const tmdbHaritasi = tmdbHazirMi() ? await yapimlariIdyeGoreCek(posterIdleri) : new Map();
+
+  return (
+    <main className="bg-stone-50 min-h-screen">
+      <section className="px-6 py-10 md:py-14">
+        <div className="max-w-6xl mx-auto">
+          <div className="flex items-end justify-between gap-4 flex-wrap mb-8">
+            <div>
+              <p className="text-stone-500 text-sm mb-1">Hoş geldin,</p>
+              <h1 className="text-4xl md:text-5xl font-bold text-stone-900">
+                {ad} <span className="text-emerald-700">👋</span>
+              </h1>
+              <p className="text-stone-600 mt-2">
+                Zevkine bir şeyler ekle, yeni insanlarla tanış.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 bg-white border border-stone-200 rounded-xl px-4 py-2 text-sm">
+              <span className="text-stone-500">Favorin</span>
+              <strong className="text-stone-900">{favoriSayisi ?? 0}</strong>
+              <span className="text-stone-300">·</span>
+              <span className="text-stone-500">Puan</span>
+              <strong className="text-stone-900">{puanSayisi ?? 0}</strong>
+            </div>
+          </div>
+
+          {/* Son favoriler */}
+          <section className="bg-white border border-stone-200 rounded-2xl p-6 mb-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-semibold text-stone-900 flex items-center gap-2">
+                <Heart className="w-5 h-5 text-rose-500" />
+                Son favorilerin
+              </h2>
+              <Link href="/profil" className="text-sm text-emerald-700 hover:text-emerald-800">
+                Tümü →
+              </Link>
+            </div>
+            {sonFavoriler && sonFavoriler.length > 0 ? (
+              <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+                {sonFavoriler.map((f) => {
+                  const y = tmdbHaritasi.get(f.movie_id);
+                  const url = y ? posterUrl(y.posterYolu, "w185") : null;
+                  return (
+                    <div
+                      key={f.movie_id}
+                      className="aspect-[2/3] rounded-lg overflow-hidden bg-stone-200 border border-stone-200"
+                    >
+                      {url ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img src={url} alt={y?.baslik ?? `#${f.movie_id}`} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs p-2 text-center">
+                          {y?.baslik ?? `#${f.movie_id}`}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="text-center py-10 border-2 border-dashed border-stone-200 rounded-xl">
+                <p className="text-stone-500 mb-3">
+                  Henüz favori eklemedin. Keşfet'ten başla.
+                </p>
+                <Link
+                  href="/kesfet"
+                  className="inline-block bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2 rounded-lg transition-colors"
+                >
+                  Keşfet'e git
+                </Link>
+              </div>
+            )}
+          </section>
+
+          {/* Hızlı erişim kartları */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <HizliKart
+              href="/kesfet"
+              icon={<Compass className="w-5 h-5" />}
+              baslik="Keşfet"
+              aciklama="Haftanın öne çıkan filmleri. Favoriye ekle, puan ver."
+              renk="emerald"
+            />
+            <HizliKart
+              href="/eslesme"
+              icon={<Sparkles className="w-5 h-5" />}
+              baslik="Eşleşmelerin"
+              aciklama="Zevkine en yakın insanları gör."
+              renk="emerald"
+            />
+            <HizliKart
+              href="/oyun"
+              icon={<Gamepad2 className="w-5 h-5" />}
+              baslik="Karakter Oyunu"
+              aciklama="Ortak favoriden karakter seç, 20 soruda bulsun."
+              renk="amber"
+              yeni
+            />
+            <HizliKart
+              href="/baslik"
+              icon={<MessageSquareText className="w-5 h-5" />}
+              baslik="Başlıklar"
+              aciklama="Ekşi + Twitter — bir yapım bir başlık, altı entry."
+              renk="emerald"
+            />
+            <HizliKart
+              href="/sohbet"
+              icon={<MessageCircle className="w-5 h-5" />}
+              baslik="Sohbetler"
+              aciklama="Eşleştiklerinle birebir mesaj."
+              renk="emerald"
+            />
+            <HizliKart
+              href="/vizyon"
+              icon={<Clapperboard className="w-5 h-5" />}
+              baslik="Vizyon"
+              aciklama="Türkiye'de sinemada ne var, yakında ne gelecek."
+              renk="emerald"
+            />
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
+
+function HizliKart({
+  href,
+  icon,
+  baslik,
+  aciklama,
+  renk,
+  yeni,
+}: {
+  href: string;
+  icon: React.ReactNode;
+  baslik: string;
+  aciklama: string;
+  renk: "emerald" | "amber";
+  yeni?: boolean;
+}) {
+  const renkSinif =
+    renk === "amber"
+      ? "bg-amber-50 text-amber-700 border-amber-200"
+      : "bg-emerald-50 text-emerald-700 border-emerald-200";
+  return (
+    <Link
+      href={href}
+      className="group relative bg-white border border-stone-200 hover:border-stone-300 hover:shadow-md transition-all rounded-2xl p-5 block"
+    >
+      {yeni && (
+        <span className="absolute top-3 right-3 bg-amber-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">
+          Yeni
+        </span>
+      )}
+      <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl border ${renkSinif} mb-3`}>
+        {icon}
+      </div>
+      <h3 className="font-semibold text-stone-900 mb-1 group-hover:text-emerald-700 transition-colors">
+        {baslik}
+      </h3>
+      <p className="text-sm text-stone-600 leading-relaxed">{aciklama}</p>
+    </Link>
   );
 }

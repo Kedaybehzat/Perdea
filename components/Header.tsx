@@ -8,6 +8,7 @@ const navLinkleri = [
   { href: "/kesfet", etiket: "Keşfet" },
   { href: "/eslesme", etiket: "Eşleş" },
   { href: "/baslik", etiket: "Başlıklar" },
+  { href: "/topluluk", etiket: "Topluluk" },
   { href: "/oyun", etiket: "Oyun" },
   { href: "/vizyon", etiket: "Vizyon" },
 ];

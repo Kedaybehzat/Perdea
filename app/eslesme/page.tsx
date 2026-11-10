@@ -1,9 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Heart, Users, Sparkles, Star, X, Check } from "lucide-react";
+import { Heart, Users, Sparkles, Star } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { enUygunEslesmeler } from "@/lib/eslesme";
 import { yapimlariIdyeGoreCek, posterUrl, tmdbHazirMi } from "@/lib/tmdb";
+import KararButonlari from "./KararButonlari";
 
 export const metadata = {
   title: "Eşleşmeler — Perdea",
@@ -158,24 +159,13 @@ function AdayKarti({
           )}
         </div>
 
-        <div className="mt-6 flex items-center gap-3">
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 bg-white border border-stone-300 hover:border-stone-400 text-stone-700 font-medium px-5 py-2.5 rounded-lg transition-colors"
-          >
-            <X className="w-4 h-4" />
-            Geç
-          </button>
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
-          >
-            <Check className="w-4 h-4" />
-            Beğen
-          </button>
-          <p className="text-xs text-stone-400 ml-2">
-            (Beğen/Geç kayıtlı değil — yakında.)
-          </p>
+        <div className="mt-6">
+          <KararButonlari
+            adayId={aday.userId}
+            adayAd={ad}
+            adayUsername={aday.username}
+            uyumYuzdesi={aday.uyumYuzdesi}
+          />
         </div>
       </div>
 

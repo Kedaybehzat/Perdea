@@ -59,7 +59,14 @@ export async function enUygunEslesmeler(limit = 5): Promise<{
     };
   }
 
-  // 2) Benimle ortak film favorilemiş diğer kullanıcılar
+  // 2) Daha önce karar verdiklerimi (beğen/geç) listeden çıkar — matches tablosu.
+  const { data: kararlar } = await supabase
+    .from("matches")
+    .select("aday_id")
+    .eq("user_id", user.id);
+  const kararVerdiklerim = new Set((kararlar ?? []).map((r) => r.aday_id as string));
+
+  // 3) Benimle ortak film favorilemiş diğer kullanıcılar
   const { data: digerFavoriler } = await supabase
     .from("favorites")
     .select("user_id, movie_id")
@@ -68,6 +75,7 @@ export async function enUygunEslesmeler(limit = 5): Promise<{
 
   const ortakHaritasi = new Map<string, Set<number>>();
   (digerFavoriler ?? []).forEach((f) => {
+    if (kararVerdiklerim.has(f.user_id)) return; // zaten karar verilmiş
     if (!ortakHaritasi.has(f.user_id)) ortakHaritasi.set(f.user_id, new Set());
     ortakHaritasi.get(f.user_id)!.add(f.movie_id);
   });

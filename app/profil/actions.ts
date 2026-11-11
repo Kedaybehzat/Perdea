@@ -34,3 +34,22 @@ export async function profilGuncelle(formData: FormData) {
 
   redirect("/profil");
 }
+
+
+// Hesabı ve hesaba bağlı her şeyi kalıcı olarak siler (KVKK silme hakkı).
+export async function hesabiSil(_onceki: { hata?: string }, formData: FormData): Promise<{ hata?: string }> {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/giris");
+
+  if (String(formData.get("onay") ?? "").trim().toLocaleUpperCase("tr-TR") !== "SİL") {
+    return { hata: "Onaylamak için kutuya SİL yaz." };
+  }
+
+  const { error } = await supabase.rpc("hesabimi_sil");
+  if (error) {
+    return { hata: "Hesap silinemedi. Biraz sonra yeniden dene ya da bize yaz." };
+  }
+  await supabase.auth.signOut();
+  redirect("/?hesap=silindi");
+}

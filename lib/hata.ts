@@ -30,6 +30,7 @@ const mesajlar: Record<string, string> = {
   ESLESME_YOK: "Yalnızca karşılıklı eşleştiğin kişilerle yazışabilirsin.",
   ENGELLI: "Bu kişiyle mesajlaşma kapalı.",
   SOHBET_YOK: "Sohbet bulunamadı.",
+  MEDYA_GECERSIZ: "Dosya gönderilemedi. Yeniden dener misin?",
   COK_HIZLI: "Biraz yavaş. Birkaç dakika sonra yeniden dene.",
   // başlık
   BASLIK_GECERSIZ: "Başlık 3–80 karakter olmalı.",

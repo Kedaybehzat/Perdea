@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import DuzenleFormu from "./DuzenleFormu";
+import HesapSil from "./HesapSil";
 
 type Props = {
   searchParams: Promise<{ hata?: string }>;
@@ -37,6 +38,7 @@ export default async function ProfilDuzenlePage({ searchParams }: Props) {
           }}
           hata={hata}
         />
+        <HesapSil />
       </div>
     </main>
   );

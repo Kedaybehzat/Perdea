@@ -2,7 +2,7 @@
 // kimin kiminle yazışabileceğine veritabanı karar verir (karşılıklı eşleşme + engel).
 import { createClient } from "@/lib/supabase/server";
 import { hataMesaji, kurulumEksikMi } from "@/lib/hata";
-import type { Kisi, Mesaj, SohbetOzeti } from "@/lib/sohbet-tipleri";
+import { MEDYA_KOVASI, type Kisi, type Mesaj, type MesajTuru, type SohbetOzeti } from "@/lib/sohbet-tipleri";
 
 export async function sohbetlerim(): Promise<{ sohbetler: SohbetOzeti[]; kurulumEksik: boolean }> {
   const supabase = await createClient();
@@ -27,13 +27,72 @@ export async function okunmamisSayisi(): Promise<number> {
 
 export async function mesajlariGetir(sohbetId: string, limit = 200): Promise<Mesaj[]> {
   const supabase = await createClient();
-  const { data } = await supabase
+  type Satir = {
+    id: number;
+    gonderen_id: string;
+    icerik: string;
+    created_at: string;
+    tur?: MesajTuru;
+    medya_yolu?: string | null;
+    sure_sn?: number | null;
+  };
+  let satirlar: Satir[] = [];
+  const yeni = await supabase
     .from("mesajlar")
-    .select("id, gonderen_id, icerik, created_at")
+    .select("id, gonderen_id, icerik, created_at, tur, medya_yolu, sure_sn")
     .eq("sohbet_id", sohbetId)
     .order("id", { ascending: false })
     .limit(limit);
-  return ((data ?? []) as Mesaj[]).reverse();
+  if (yeni.error) {
+    // Medya sütunları henüz yoksa (son migration çalışmadıysa) yalnızca metinle devam et.
+    const eski = await supabase
+      .from("mesajlar")
+      .select("id, gonderen_id, icerik, created_at")
+      .eq("sohbet_id", sohbetId)
+      .order("id", { ascending: false })
+      .limit(limit);
+    satirlar = (eski.data ?? []) as Satir[];
+  } else {
+    satirlar = (yeni.data ?? []) as Satir[];
+  }
+  satirlar.reverse();
+
+  // Medya dosyaları özel kovada; görüntülemek için kısa ömürlü imzalı adres üret.
+  const yollar = satirlar.map((m) => m.medya_yolu).filter((y): y is string => Boolean(y));
+  const adresler = new Map<string, string>();
+  if (yollar.length) {
+    const { data } = await supabase.storage.from(MEDYA_KOVASI).createSignedUrls(yollar, 3600);
+    for (const d of data ?? []) {
+      if (d.path && d.signedUrl) adresler.set(d.path, d.signedUrl);
+    }
+  }
+
+  return satirlar.map((m) => ({
+    id: m.id,
+    gonderen_id: m.gonderen_id,
+    icerik: m.icerik,
+    created_at: m.created_at,
+    tur: m.tur ?? "metin",
+    sure_sn: m.sure_sn ?? null,
+    medya_url: m.medya_yolu ? adresler.get(m.medya_yolu) ?? null : null,
+  }));
+}
+
+export async function medyaMesajiGonder(
+  sohbetId: string,
+  tur: "gorsel" | "ses",
+  yol: string,
+  sureSn?: number
+): Promise<{ hata?: string }> {
+  const supabase = await createClient();
+  const { error } = await supabase.rpc("medya_mesaji_gonder", {
+    p_sohbet: sohbetId,
+    p_tur: tur,
+    p_yol: yol,
+    p_sure: sureSn ?? null,
+  });
+  if (error) return { hata: hataMesaji(error) };
+  return {};
 }
 
 export async function sohbetAc(digerId: string): Promise<{ hata?: string; id?: string }> {

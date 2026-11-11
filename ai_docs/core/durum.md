@@ -38,6 +38,8 @@ Eski `~/Desktop/projects/perdea2` iCloud sync tuzağı yüzünden taşındı (`t
 - **DB:** `docs/migrations/2026-11-11_salon_cosplay_oyun.sql` Supabase SQL Editor'de BİR KEZ çalıştırılmalı (idempotent). Çalışmadıysa sayfalar "kurulum eksik" notu gösterir (`lib/hata.ts` → `kurulumEksikMi`).
 - **2. tur (aynı gün):** kesfet, vizyon, eslesme, profil, u/[username] yeni tasarıma geçti; hareket katmanı eklendi (`globals.css` → "Hareket" bölümü: `goster`, `sirali`, `kalkar`, `afis`, `iskelet`, `perde-acilis`, `konfeti`, `halka-dol`; sayfa geçişi `app/template.tsx`). Yeni parçalar: `PerdeBandi`, `AfisYok`, `UyumHalkasi`, `Konfeti`.
 - **3. tur (aynı gün):** Sohbet (`/sohbet`), Başlıklar (`/baslik`), Akış (`/topluluk`) full-stack bitti → `gorevler/sohbet-baslik-akis.md`. **DB:** `docs/migrations/2026-11-11b_sohbet_baslik_akis.sql` de çalıştırılmalı (ilkinden SONRA). Mockup sayfa kalmadı.
+- **4. tur (aynı gün):** sohbette fotoğraf + sesli mesaj, bildirimler (`/bildirimler`, üst menü zili, sekme başlığı sayacı, tarayıcı bildirimi), KVKK (`/kvkk`, `/kosullar`, kayıtta zorunlu onay kutusu, hesap silme) → `gorevler/medya-bildirim-kvkk.md`. **DB:** `docs/migrations/2026-11-11c_medya_bildirim_kvkk.sql` (üçüncü ve son dosya; sırayla a → b → c). `2026-11-11b` artık `matches` tablosunu da kuruyor (canlı DB'de yoktu).
+- **Yayın öncesi doldurulacak:** `lib/yasal.ts` (veri sorumlusu adı + adres). Metinler hukukçu kontrolünden geçmedi.
 - Kullanılmayan eski bileşenler (silinebilir): `components/KarsilamaKarti.tsx`, `Sayac.tsx`, `YakindaSayfasi.tsx`.
 
 ## Kalan işler (sıralı)

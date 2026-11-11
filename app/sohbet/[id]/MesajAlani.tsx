@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, useTransition } from "react";
-import { ArrowLeft, Ban, MoreVertical, Send } from "lucide-react";
+import { ArrowLeft, Ban, ImagePlus, Mic, MoreVertical, Send, Square, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import Avatar from "@/components/ui/Avatar";
 import BildirFormu from "@/components/ui/BildirFormu";
@@ -11,9 +11,11 @@ import type { Kisi, Mesaj } from "@/lib/sohbet-tipleri";
 import {
   engelKaldirAction,
   engelleAction,
+  medyaGonderAction,
   mesajGonderAction,
   sohbetSikayetAction,
 } from "../actions";
+import { EN_BUYUK_GORSEL, EN_UZUN_SES_SN, gorseliHazirla, medyaYukle, sesBicimi } from "./medya";
 
 type Bekleyen = { anahtar: number; icerik: string; hata?: string };
 
@@ -54,6 +56,10 @@ export default function MesajAlani({
   const [, baslat] = useTransition();
   const son = useRef<HTMLDivElement>(null);
   const sayac = useRef(0);
+  const dosyaGirdisi = useRef<HTMLInputElement>(null);
+  const [yukleniyor, setYukleniyor] = useState<string>();
+  const [kayitSn, setKayitSn] = useState<number | null>(null);
+  const kayit = useRef<{ kaydedici: MediaRecorder; akis: MediaStream; iptal: boolean; baslangic: number } | null>(null);
 
   // Canlı: yeni mesaj gelince tazele. Realtime bağlanamazsa birkaç saniyede bir yokla.
   useEffect(() => {
@@ -110,6 +116,105 @@ export default function MesajAlani({
       setBekleyenler((b) => b.filter((x) => x.anahtar !== k));
     });
   }
+
+  async function medyaGonder(tur: "gorsel" | "ses", veri: Blob, uzanti: string, tip: string, sureSn?: number) {
+    setHata(undefined);
+    setYukleniyor(tur === "gorsel" ? "Fotoğraf gönderiliyor…" : "Sesli mesaj gönderiliyor…");
+    try {
+      const yukleme = await medyaYukle(sohbetId, benId, veri, uzanti, tip);
+      if (yukleme.hata || !yukleme.yol) {
+        setHata(yukleme.hata ?? "Dosya yüklenemedi.");
+        return;
+      }
+      const r = await medyaGonderAction(sohbetId, tur, yukleme.yol, sureSn);
+      if (r.hata) setHata(r.hata);
+      else router.refresh();
+    } finally {
+      setYukleniyor(undefined);
+    }
+  }
+
+  async function gorselSecildi(e: React.ChangeEvent<HTMLInputElement>) {
+    const dosya = e.target.files?.[0];
+    e.target.value = "";
+    if (!dosya) return;
+    if (!dosya.type.startsWith("image/")) {
+      setHata("Yalnızca fotoğraf gönderebilirsin.");
+      return;
+    }
+    if (dosya.size > EN_BUYUK_GORSEL) {
+      setHata("Fotoğraf çok büyük (en çok 15 MB).");
+      return;
+    }
+    try {
+      const kucuk = await gorseliHazirla(dosya);
+      await medyaGonder("gorsel", kucuk, "jpg", "image/jpeg");
+    } catch {
+      setHata("Bu fotoğraf açılamadı. Başka bir dosya dener misin?");
+    }
+  }
+
+  async function kaydiBaslat() {
+    setHata(undefined);
+    const bicim = sesBicimi();
+    if (!bicim || !navigator.mediaDevices?.getUserMedia) {
+      setHata("Bu tarayıcı ses kaydını desteklemiyor.");
+      return;
+    }
+    let akis: MediaStream;
+    try {
+      akis = await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch {
+      setHata("Mikrofona izin verilmedi. Tarayıcının adres çubuğundan izin verip yeniden dene.");
+      return;
+    }
+    const parcalar: Blob[] = [];
+    const kaydedici = new MediaRecorder(akis, { mimeType: bicim.mime });
+    const durum = { kaydedici, akis, iptal: false, baslangic: Date.now() };
+    kayit.current = durum;
+    kaydedici.ondataavailable = (ev) => {
+      if (ev.data.size) parcalar.push(ev.data);
+    };
+    kaydedici.onstop = () => {
+      akis.getTracks().forEach((t) => t.stop());
+      const sure = Math.max(1, Math.round((Date.now() - durum.baslangic) / 1000));
+      kayit.current = null;
+      setKayitSn(null);
+      if (durum.iptal || !parcalar.length) return;
+      void medyaGonder("ses", new Blob(parcalar, { type: bicim.tip }), bicim.uzanti, bicim.tip, Math.min(sure, EN_UZUN_SES_SN));
+    };
+    kaydedici.start();
+    setKayitSn(0);
+  }
+
+  function kaydiBitir(iptal: boolean) {
+    const k = kayit.current;
+    if (!k) return;
+    k.iptal = iptal;
+    if (k.kaydedici.state !== "inactive") k.kaydedici.stop();
+  }
+
+  // Kayıt sayacı; süre dolunca kendiliğinden gönderir. Sayfadan çıkılırsa mikrofonu bırak.
+  useEffect(() => {
+    if (kayitSn === null) return;
+    if (kayitSn >= EN_UZUN_SES_SN) {
+      kaydiBitir(false);
+      return;
+    }
+    const z = setTimeout(() => setKayitSn((s) => (s === null ? null : s + 1)), 1000);
+    return () => clearTimeout(z);
+  }, [kayitSn]);
+  useEffect(
+    () => () => {
+      const k = kayit.current;
+      if (k) {
+        k.iptal = true;
+        if (k.kaydedici.state !== "inactive") k.kaydedici.stop();
+        k.akis.getTracks().forEach((t) => t.stop());
+      }
+    },
+    []
+  );
 
   function formGonder(e: React.FormEvent) {
     e.preventDefault();
@@ -210,7 +315,7 @@ export default function MesajAlani({
                   {s.etiket}
                 </li>
               ) : (
-                <Balon key={s.m.id} benden={s.m.gonderen_id === benId} icerik={s.m.icerik} saat={saatBicimi.format(new Date(s.m.created_at))} />
+                <Balon key={s.m.id} benden={s.m.gonderen_id === benId} m={s.m} saat={saatBicimi.format(new Date(s.m.created_at))} />
               )
             )}
             {bekleyenler.map((b) => (
@@ -238,6 +343,7 @@ export default function MesajAlani({
       {/* Yazma alanı */}
       <div className="border-t border-stone-200 p-3">
         {hata && <p role="alert" className="text-sm text-rose-700 mb-2">{hata}</p>}
+        {yukleniyor && <p role="status" className="text-sm text-stone-500 mb-2">{yukleniyor}</p>}
         {engelli ? (
           <p className="text-sm text-stone-600 text-center py-2">
             {benEngelledim ? (
@@ -252,36 +358,125 @@ export default function MesajAlani({
             )}
           </p>
         ) : (
-          <form onSubmit={formGonder} className="flex items-end gap-2">
-            <textarea
-              value={metin}
-              onChange={(e) => setMetin(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
-                  e.preventDefault();
-                  gonder(metin);
-                  setMetin("");
-                }
-              }}
-              rows={1}
-              maxLength={1000}
-              aria-label="Mesajın"
-              placeholder="Bir mesaj yaz"
-              className="alan flex-1 resize-none max-h-32 [field-sizing:content]"
-            />
-            <button type="submit" disabled={!metin.trim()} aria-label="Gönder" className="dugme px-4! h-[46px]">
-              <Send className="w-4 h-4" />
-            </button>
-          </form>
+          kayitSn !== null ? (
+            <div className="flex items-center gap-3" role="status">
+              <button
+                type="button"
+                onClick={() => kaydiBitir(true)}
+                aria-label="Kaydı iptal et"
+                className="p-3 rounded-xl text-stone-500 hover:text-rose-600 hover:bg-rose-50"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
+              <span className="flex-1 flex items-center gap-3 px-4 h-[46px] rounded-xl bg-rose-50 border border-rose-200 text-rose-800 font-semibold">
+                <span className="w-2.5 h-2.5 rounded-full bg-rose-600 animate-pulse" aria-hidden />
+                Kaydediliyor
+                <span className="tabular-nums ml-auto">
+                  {sureYaz(kayitSn)} / {sureYaz(EN_UZUN_SES_SN)}
+                </span>
+              </span>
+              <button type="button" onClick={() => kaydiBitir(false)} aria-label="Kaydı bitir ve gönder" className="dugme px-4! h-[46px]">
+                <Square className="w-4 h-4 fill-current" />
+                Gönder
+              </button>
+            </div>
+          ) : (
+            <form onSubmit={formGonder} className="flex items-end gap-1.5">
+              <input ref={dosyaGirdisi} type="file" accept="image/*" hidden onChange={gorselSecildi} />
+              <button
+                type="button"
+                onClick={() => dosyaGirdisi.current?.click()}
+                disabled={Boolean(yukleniyor)}
+                aria-label="Fotoğraf gönder"
+                title="Fotoğraf gönder"
+                className="p-3 rounded-xl text-stone-600 hover:text-emerald-700 hover:bg-stone-100 disabled:opacity-50"
+              >
+                <ImagePlus className="w-5 h-5" />
+              </button>
+              <textarea
+                value={metin}
+                onChange={(e) => setMetin(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+                    e.preventDefault();
+                    gonder(metin);
+                    setMetin("");
+                  }
+                }}
+                rows={1}
+                maxLength={1000}
+                aria-label="Mesajın"
+                placeholder="Bir mesaj yaz"
+                className="alan flex-1 resize-none max-h-32 [field-sizing:content]"
+              />
+              {metin.trim() ? (
+                <button type="submit" aria-label="Gönder" className="dugme px-4! h-[46px]">
+                  <Send className="w-4 h-4" />
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={kaydiBaslat}
+                  disabled={Boolean(yukleniyor)}
+                  aria-label="Sesli mesaj kaydet"
+                  title="Sesli mesaj kaydet"
+                  className="dugme px-4! h-[46px]"
+                >
+                  <Mic className="w-4 h-4" />
+                </button>
+              )}
+            </form>
+          )
         )}
       </div>
     </section>
   );
 }
 
-function Balon({ benden, icerik, saat }: { benden: boolean; icerik: string; saat: string }) {
-  return (
-    <li className={`max-w-[80%] flex flex-col ${benden ? "self-end items-end" : "self-start items-start"}`}>
+function sureYaz(sn: number): string {
+  return `${Math.floor(sn / 60)}:${String(sn % 60).padStart(2, "0")}`;
+}
+
+function Balon({ benden, m, saat }: { benden: boolean; m: Mesaj; saat: string }) {
+  const hiza = benden ? "self-end items-end" : "self-start items-start";
+  let govde: React.ReactNode;
+
+  if (m.tur !== "metin" && !m.medya_url) {
+    govde = (
+      <span className="px-4 py-2.5 rounded-2xl bg-stone-100 text-stone-500 text-sm italic">
+        {m.tur === "gorsel" ? "Fotoğraf yüklenemedi" : "Sesli mesaj yüklenemedi"}
+      </span>
+    );
+  } else if (m.tur === "gorsel") {
+    govde = (
+      <a
+        href={m.medya_url!}
+        target="_blank"
+        rel="noreferrer"
+        className="block rounded-2xl overflow-hidden border border-stone-200 bg-stone-100 hover:opacity-95 transition-opacity"
+        title="Büyük hâlini aç"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={m.medya_url!} alt="Gönderilen fotoğraf" loading="lazy" className="block max-h-80 max-w-full w-auto" />
+      </a>
+    );
+  } else if (m.tur === "ses") {
+    govde = (
+      <span
+        className={`flex items-center gap-2 pl-2 pr-3 py-2 rounded-2xl ${
+          benden ? "bg-emerald-600 rounded-br-md" : "bg-white border border-stone-200 rounded-bl-md"
+        }`}
+      >
+        <audio controls preload="metadata" src={m.medya_url!} className="h-10 w-56 max-w-full" aria-label="Sesli mesaj" />
+        {m.sure_sn ? (
+          <span className={`text-xs tabular-nums ${benden ? "text-emerald-50" : "text-stone-500"}`}>
+            {sureYaz(m.sure_sn)}
+          </span>
+        ) : null}
+      </span>
+    );
+  } else {
+    govde = (
       <span
         className={`px-4 py-2.5 rounded-2xl whitespace-pre-wrap [overflow-wrap:anywhere] ${
           benden
@@ -289,8 +484,14 @@ function Balon({ benden, icerik, saat }: { benden: boolean; icerik: string; saat
             : "bg-white border border-stone-200 text-stone-900 rounded-bl-md"
         }`}
       >
-        {icerik}
+        {m.icerik}
       </span>
+    );
+  }
+
+  return (
+    <li className={`max-w-[80%] flex flex-col ${hiza}`}>
+      {govde}
       <span className="text-[11px] text-stone-400 mt-0.5 px-1">{saat}</span>
     </li>
   );

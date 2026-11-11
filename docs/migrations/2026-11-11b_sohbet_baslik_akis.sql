@@ -1,9 +1,59 @@
 -- ============================================================================
 -- Perdea — Sohbet · Başlık/Entry · Akış
 -- Supabase SQL Editor'e yapıştırıp BİR KEZ çalıştır (tekrar çalıştırmak güvenli).
--- Önkoşul: docs/schema.sql (users, matches) ve
+-- Önkoşul: docs/schema.sql (users) ve
 --          2026-11-11_salon_cosplay_oyun.sql (perdea_sade, sikayetler).
 -- ============================================================================
+
+-- ----------------------------------------------------------------------------
+-- 0a) EŞLEŞME KARARLARI — Beğen/Geç (docs/schema.sql'deki "matches" bölümü).
+--     Daha önce çalıştırılmadıysa burada kurulur; çalıştırıldıysa dokunulmaz.
+-- ----------------------------------------------------------------------------
+
+create table if not exists matches (
+  user_id uuid references users(id) on delete cascade not null,
+  aday_id uuid references users(id) on delete cascade not null,
+  karar text not null check (karar in ('begen','gec')),
+  created_at timestamptz default now(),
+  primary key (user_id, aday_id),
+  check (user_id <> aday_id)
+);
+create index if not exists matches_user_karar_idx on matches (user_id, karar);
+
+alter table matches enable row level security;
+
+drop policy if exists "kişi kendi kararlarını okur" on matches;
+create policy "kişi kendi kararlarını okur"
+on matches for select
+using (auth.uid() = user_id);
+
+drop policy if exists "kişi kendi kararını ekler" on matches;
+create policy "kişi kendi kararını ekler"
+on matches for insert
+with check (auth.uid() = user_id);
+
+drop policy if exists "kişi kendi kararını günceller" on matches;
+create policy "kişi kendi kararını günceller"
+on matches for update
+using (auth.uid() = user_id)
+with check (auth.uid() = user_id);
+
+create or replace function karsilikli_eslesme(aday uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+as $$
+  select exists(
+    select 1 from matches
+    where user_id = aday
+      and aday_id = auth.uid()
+      and karar = 'begen'
+  );
+$$;
+
+revoke all on function karsilikli_eslesme(uuid) from public;
+grant execute on function karsilikli_eslesme(uuid) to authenticated;
 
 -- ----------------------------------------------------------------------------
 -- 0) ENGEL — bir kullanıcı diğerini engelleyebilir (mesajlaşmayı keser)

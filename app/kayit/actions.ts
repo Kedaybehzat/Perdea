@@ -28,6 +28,11 @@ export async function kayitOl(formData: FormData) {
     redirect('/kayit?hata=' + encodeURIComponent(hata))
   }
 
+  // Yaş beyanı + koşullar + KVKK açık rızası olmadan hesap açılmaz.
+  if (formData.get('onay') !== 'evet') {
+    redirect('/kayit?hata=' + encodeURIComponent('Devam etmek için 18 yaş beyanını ve koşulları onaylamalısın.'))
+  }
+
   // ADIM 1: auth kimliği oluştur
   const { data, error } = await supabase.auth.signUp({ email, password })
 
@@ -36,10 +41,18 @@ export async function kayitOl(formData: FormData) {
   }
 
   // ADIM 2: users tablosuna profil satırı ekle
-  const { error: profilHatasi } = await supabase.from('users').insert({
+  let { error: profilHatasi } = await supabase.from('users').insert({
     id: data.user!.id,
     username: username,
+    kvkk_onay_at: new Date().toISOString(),
   })
+  // Onay sütunu henüz yoksa (son migration çalışmadıysa) kayıt yine de tamamlansın.
+  if (profilHatasi && (profilHatasi.code === 'PGRST204' || profilHatasi.code === '42703')) {
+    ;({ error: profilHatasi } = await supabase.from('users').insert({
+      id: data.user!.id,
+      username: username,
+    }))
+  }
 
   if (profilHatasi) {
     if (profilHatasi.code === '23505') {

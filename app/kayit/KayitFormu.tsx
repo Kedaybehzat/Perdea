@@ -83,6 +83,27 @@ export default function KayitFormu({ hata }: { hata?: string }) {
           />
         </div>
 
+        <label className="flex items-start gap-3 text-sm text-stone-700 leading-relaxed cursor-pointer">
+          <input
+            type="checkbox"
+            name="onay"
+            value="evet"
+            required
+            className="mt-1 w-4 h-4 shrink-0 accent-emerald-600"
+          />
+          <span>
+            18 yaşından büyüğüm.{" "}
+            <Link href="/kosullar" target="_blank" className="text-emerald-700 font-semibold underline">
+              Kullanım Koşulları
+            </Link>
+            ’nı kabul ediyorum;{" "}
+            <Link href="/kvkk" target="_blank" className="text-emerald-700 font-semibold underline">
+              KVKK Aydınlatma Metni
+            </Link>
+            ’ni okudum ve verilerimin yurt dışındaki sunucularda saklanmasına açık rıza veriyorum.
+          </span>
+        </label>
+
         <button
           type="submit"
           className="dugme mt-2 py-3!"

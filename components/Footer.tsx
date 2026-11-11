@@ -31,6 +31,8 @@ const sutunlar = [
     linkler: [
       { href: "/hakkimizda", etiket: "Hakkımızda" },
       { href: "/iletisim", etiket: "İletişim" },
+      { href: "/kvkk", etiket: "KVKK" },
+      { href: "/kosullar", etiket: "Kullanım koşulları" },
     ],
   },
 ];

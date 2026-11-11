@@ -2,13 +2,25 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { engeliKaldir, engelle, mesajGonder, sohbetAc } from "@/lib/sohbet";
+import { engeliKaldir, engelle, medyaMesajiGonder, mesajGonder, sohbetAc } from "@/lib/sohbet";
 import { sikayetEt } from "@/lib/bulusma";
 
 export type FormDurumu = { hata?: string; tamam?: string };
 
 export async function mesajGonderAction(sohbetId: string, icerik: string): Promise<{ hata?: string }> {
   const sonuc = await mesajGonder(sohbetId, icerik);
+  if (sonuc.hata) return sonuc;
+  revalidatePath(`/sohbet/${sohbetId}`);
+  return {};
+}
+
+export async function medyaGonderAction(
+  sohbetId: string,
+  tur: "gorsel" | "ses",
+  yol: string,
+  sureSn?: number
+): Promise<{ hata?: string }> {
+  const sonuc = await medyaMesajiGonder(sohbetId, tur, yol, sureSn);
   if (sonuc.hata) return sonuc;
   revalidatePath(`/sohbet/${sohbetId}`);
   return {};

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { MessageCircle } from "lucide-react";
 import Avatar from "@/components/ui/Avatar";
 import { goreceli } from "@/lib/zaman";
-import { kisiAdi, type Kisi, type SohbetOzeti } from "@/lib/sohbet-tipleri";
+import { kisiAdi, mesajOzeti, type Kisi, type SohbetOzeti } from "@/lib/sohbet-tipleri";
 import { sohbetBaslatAction } from "./actions";
 
 // Sol sütun: yeni eşleşmeler (henüz yazışılmamış) + sohbetler.
@@ -89,7 +89,7 @@ export default function SohbetListesi({
                         }`}
                       >
                         {s.son_mesaj
-                          ? `${s.son_mesaj.benden ? "Sen: " : ""}${s.son_mesaj.icerik}`
+                          ? `${s.son_mesaj.benden ? "Sen: " : ""}${mesajOzeti(s.son_mesaj)}`
                           : "Henüz mesaj yok. İlk sen yaz."}
                       </span>
                       {s.okunmamis > 0 && (

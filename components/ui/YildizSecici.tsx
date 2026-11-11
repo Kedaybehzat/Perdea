@@ -42,9 +42,11 @@ export default function YildizSecici({
             className="p-1 rounded transition-transform hover:scale-110"
           >
             <Star
+              key={n <= deger ? `d${deger}` : "b"}
               className={`w-6 h-6 transition-colors ${
                 n <= gosterilen ? "text-altin fill-altin" : "text-stone-300"
-              }`}
+              } ${n <= deger ? "animate-zipla" : ""}`}
+              style={n <= deger ? { animationDelay: `${(n - 1) * 45}ms` } : undefined}
             />
           </button>
         ))}

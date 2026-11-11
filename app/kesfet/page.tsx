@@ -1,7 +1,9 @@
 import Link from "next/link";
-import { Search, Film, Tv, Sparkles } from "lucide-react";
+import { Search, Film, Tv, Sparkles, SearchX } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { trendYapimlar, yapimAra, posterUrl, tmdbHazirMi } from "@/lib/tmdb";
+import PerdeBandi from "@/components/ui/PerdeBandi";
+import BosDurum from "@/components/ui/BosDurum";
 import YapimKart from "./YapimKart";
 
 export const metadata = {
@@ -9,27 +11,22 @@ export const metadata = {
   description: "Haftanın öne çıkan filmleri ve dizileri. Favoriye ekle, puan ver.",
 };
 
+type Tur = "film" | "dizi" | "hepsi";
 type Props = {
-  searchParams: Promise<{ q?: string; tur?: "film" | "dizi" | "hepsi" }>;
+  searchParams: Promise<{ q?: string; tur?: Tur }>;
 };
 
 export default async function KesfetSayfasi({ searchParams }: Props) {
   const { q, tur } = await searchParams;
   const sorgu = (q ?? "").trim();
-  const seciliTur: "film" | "dizi" | "hepsi" = tur ?? "hepsi";
+  const seciliTur: Tur = tur === "film" || tur === "dizi" ? tur : "hepsi";
 
   if (!tmdbHazirMi()) {
     return <TmdbKurulumu />;
   }
 
   const yapimlar = sorgu
-    ? (await yapimAra(sorgu)).filter((y) =>
-        seciliTur === "hepsi"
-          ? true
-          : seciliTur === "film"
-          ? y.tur === "film"
-          : y.tur === "dizi"
-      )
+    ? (await yapimAra(sorgu)).filter((y) => (seciliTur === "hepsi" ? true : y.tur === seciliTur))
     : await trendYapimlar(seciliTur);
 
   const supabase = await createClient();
@@ -57,75 +54,94 @@ export default async function KesfetSayfasi({ searchParams }: Props) {
     }
   }
 
+  const turBaglantisi = (t: Tur) => {
+    const p = new URLSearchParams();
+    if (sorgu) p.set("q", sorgu);
+    if (t !== "hepsi") p.set("tur", t);
+    const s = p.toString();
+    return s ? `/kesfet?${s}` : "/kesfet";
+  };
+
   return (
     <main className="bg-stone-50 min-h-screen">
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-2">
-            Keşfet
-          </h1>
-          <p className="text-stone-600">
-            Haftanın öne çıkan yapımları, zevkine katacakların. Favoriye ekle, puan ver.
-          </p>
-        </div>
-
-        {/* Arama + filtre */}
-        <form
-          action="/kesfet"
-          method="get"
-          className="bg-white border border-stone-200 rounded-2xl p-4 md:p-5 mb-8 flex flex-col md:flex-row gap-3"
-        >
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+      <PerdeBandi
+        ustEtiket="Keşfet"
+        baslik="Bu hafta"
+        vurgu="ne izlenir?"
+        aciklama="Sevdiğini kalple işaretle, izlediğine puan ver. Eşleşmelerin bunlardan çıkıyor."
+      >
+        <form action="/kesfet" method="get" className="flex gap-2 md:w-96" role="search">
+          {seciliTur !== "hepsi" && <input type="hidden" name="tur" value={seciliTur} />}
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
             <input
               type="search"
               name="q"
               defaultValue={sorgu}
-              placeholder="Film, dizi, anime ara..."
-              className="w-full pl-10 pr-4 py-2.5 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 focus:ring-2 focus:ring-emerald-100"
+              placeholder="Film, dizi, anime ara"
+              aria-label="Film, dizi, anime ara"
+              className="alan pl-10! border-transparent!"
             />
           </div>
-          <div className="flex items-center gap-1 bg-stone-100 rounded-lg p-1">
-            <TurRadio ad="hepsi" etiket="Hepsi" secili={seciliTur} icon={<Sparkles className="w-4 h-4" />} />
-            <TurRadio ad="film" etiket="Film" secili={seciliTur} icon={<Film className="w-4 h-4" />} />
-            <TurRadio ad="dizi" etiket="Dizi" secili={seciliTur} icon={<Tv className="w-4 h-4" />} />
-          </div>
-          <button
-            type="submit"
-            className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
-          >
+          <button type="submit" className="dugme bg-altin! text-perde-950! hover:brightness-105 shadow-none!">
             Ara
           </button>
         </form>
+      </PerdeBandi>
+
+      <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="flex items-center justify-between gap-4 flex-wrap mb-6">
+          <nav className="inline-flex p-1 bg-stone-200/70 rounded-xl" aria-label="Tür">
+            <TurSekmesi href={turBaglantisi("hepsi")} aktif={seciliTur === "hepsi"} icon={<Sparkles className="w-4 h-4" />}>
+              Hepsi
+            </TurSekmesi>
+            <TurSekmesi href={turBaglantisi("film")} aktif={seciliTur === "film"} icon={<Film className="w-4 h-4" />}>
+              Film
+            </TurSekmesi>
+            <TurSekmesi href={turBaglantisi("dizi")} aktif={seciliTur === "dizi"} icon={<Tv className="w-4 h-4" />}>
+              Dizi
+            </TurSekmesi>
+          </nav>
+          <p className="text-sm text-stone-500">
+            {sorgu ? (
+              <>
+                <strong className="text-stone-900">“{sorgu}”</strong> için {yapimlar.length} sonuç ·{" "}
+                <Link href="/kesfet" className="underline underline-offset-4 hover:text-stone-900">
+                  aramayı temizle
+                </Link>
+              </>
+            ) : (
+              "Haftanın öne çıkanları"
+            )}
+          </p>
+        </div>
 
         {!user && (
-          <div className="mb-6 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-xl px-4 py-3 flex items-center justify-between gap-3 flex-wrap">
-            <span>
-              Favorilerini kaydetmek ve puan vermek için{" "}
-              <Link href="/giris" className="underline font-medium">
-                giriş yap
-              </Link>
-              .
+          <div className="mb-6 bg-white border border-stone-200 rounded-2xl px-5 py-4 flex items-center justify-between gap-3 flex-wrap">
+            <span className="text-stone-700">
+              Favorilerin ve puanların kaydolsun diye önce giriş yap.
             </span>
-            <Link
-              href="/kayit"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-1.5 rounded-lg text-sm"
-            >
-              Kayıt ol
-            </Link>
+            <span className="flex gap-2">
+              <Link href="/giris" className="dugme-cizgi py-2!">Giriş yap</Link>
+              <Link href="/kayit" className="dugme py-2!">Kayıt ol</Link>
+            </span>
           </div>
         )}
 
         {yapimlar.length === 0 ? (
-          <div className="text-center py-20 bg-white border border-stone-200 rounded-2xl">
-            <p className="text-stone-500">
-              {sorgu
-                ? `"${sorgu}" için sonuç bulunamadı.`
-                : "TMDB'den sonuç alınamadı. Birazdan tekrar dene."}
-            </p>
-          </div>
+          <BosDurum
+            icon={SearchX}
+            baslik={sorgu ? "Bunu bulamadık" : "Liste şu an gelmedi"}
+            aciklama={
+              sorgu
+                ? `“${sorgu}” için sonuç yok. Özgün adıyla ya da daha kısa yazarak dene.`
+                : "Film verisi şu an alınamadı. Bir dakika sonra sayfayı yenile."
+            }
+          >
+            {sorgu && <Link href="/kesfet" className="dugme">Öne çıkanlara dön</Link>}
+          </BosDurum>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="sirali grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-5 gap-y-8">
             {yapimlar.map((y) => (
               <YapimKart
                 key={`${y.tur}-${y.id}`}
@@ -139,7 +155,7 @@ export default async function KesfetSayfasi({ searchParams }: Props) {
           </div>
         )}
 
-        <p className="text-center text-xs text-stone-400 mt-10">
+        <p className="text-center text-xs text-stone-400 mt-12">
           Film verileri TMDB tarafından sağlanır.
         </p>
       </div>
@@ -147,43 +163,43 @@ export default async function KesfetSayfasi({ searchParams }: Props) {
   );
 }
 
-function TurRadio({
-  ad,
-  etiket,
-  secili,
+function TurSekmesi({
+  href,
+  aktif,
   icon,
+  children,
 }: {
-  ad: "film" | "dizi" | "hepsi";
-  etiket: string;
-  secili: string;
+  href: string;
+  aktif: boolean;
   icon: React.ReactNode;
+  children: React.ReactNode;
 }) {
-  const aktif = secili === ad;
   return (
-    <label
-      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md cursor-pointer text-sm font-medium transition-colors ${
-        aktif ? "bg-white text-emerald-700 shadow-sm" : "text-stone-600 hover:text-stone-900"
+    <Link
+      href={href}
+      aria-current={aktif ? "page" : undefined}
+      className={`flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+        aktif ? "bg-white text-emerald-800 shadow-sm" : "text-stone-600 hover:text-stone-900"
       }`}
     >
-      <input type="radio" name="tur" value={ad} defaultChecked={aktif} className="sr-only" />
       {icon}
-      {etiket}
-    </label>
+      {children}
+    </Link>
   );
 }
 
 function TmdbKurulumu() {
   return (
     <main className="min-h-[70vh] flex flex-col items-center justify-center px-6 py-16">
-      <div className="max-w-xl text-center bg-white border border-stone-200 rounded-2xl p-8">
-        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 mb-5">
+      <div className="max-w-xl text-center bg-white border border-stone-200 rounded-3xl p-8">
+        <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-700 mb-5">
           <Film className="w-6 h-6" />
         </div>
-        <h1 className="text-2xl font-bold text-stone-900 mb-3">
-          Keşfet için TMDB kurulumu gerekiyor
+        <h1 className="text-3xl font-bold text-stone-900 mb-3">
+          Keşfet için TMDB anahtarı gerekiyor
         </h1>
         <p className="text-stone-600 text-sm leading-relaxed mb-5">
-          Film verileri TMDB'den çekiliyor.{" "}
+          Film verileri TMDB&apos;den çekiliyor.{" "}
           <a
             href="https://www.themoviedb.org/settings/api"
             target="_blank"
@@ -192,14 +208,14 @@ function TmdbKurulumu() {
           >
             TMDB API anahtarı
           </a>{" "}
-          al, sonra <code className="bg-stone-100 px-1.5 py-0.5 rounded text-xs">.env.local</code>'a şu satırı ekle:
+          al, sonra <code className="bg-stone-100 px-1.5 py-0.5 rounded text-xs">.env.local</code> dosyasına şu satırı ekle:
         </p>
         <pre className="bg-stone-900 text-stone-100 text-xs rounded-lg p-3 text-left overflow-x-auto mb-5">
           TMDB_API_KEY=buraya_anahtari_yapistir
         </pre>
         <p className="text-xs text-stone-500">
-          Anahtar <strong>NEXT_PUBLIC</strong> değil — sadece sunucu tarafından
-          okunur. Değiştirince <code className="bg-stone-100 px-1 rounded">npm run dev</code>'i yeniden başlat.
+          Anahtar <strong>NEXT_PUBLIC</strong> değil; yalnızca sunucu okur. Değiştirince{" "}
+          <code className="bg-stone-100 px-1 rounded">npm run dev</code> komutunu yeniden başlat.
         </p>
       </div>
     </main>

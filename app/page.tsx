@@ -32,7 +32,7 @@ function Karsilama() {
   return (
     <main>
       {/* Perde: hero */}
-      <section className="perde-zemin text-stone-50 relative overflow-hidden">
+      <section className="perde-zemin perde-acilis text-stone-50 relative overflow-hidden">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-14 pb-20 md:pt-20 md:pb-28 grid grid-cols-1 lg:grid-cols-2 gap-14 items-center">
           <div className="text-center lg:text-left animate-belir">
             <p className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-altin mb-6">
@@ -96,7 +96,7 @@ function Karsilama() {
       {/* Neler var */}
       <section className="px-4 sm:px-6 py-20">
         <div className="max-w-6xl mx-auto">
-          <div className="max-w-2xl mb-10">
+          <div className="max-w-2xl mb-10 goster">
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700 mb-2">
               Tek çatı altında
             </p>
@@ -105,11 +105,11 @@ function Karsilama() {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-6 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-6 gap-5 *:goster">
             {/* Eşleşme */}
             <Link
               href="/eslesme"
-              className="group md:col-span-3 rounded-3xl bg-emerald-600 text-white p-7 sm:p-8 flex flex-col justify-between min-h-72 hover:bg-emerald-700 transition-colors"
+              className="group kalkar md:col-span-3 rounded-3xl bg-emerald-600 text-white p-7 sm:p-8 flex flex-col justify-between min-h-72 hover:bg-emerald-700 transition-colors"
             >
               <div className="flex items-center">
                 <Avatar ad="Deniz" boyut="lg" className="ring-4 ring-emerald-600 group-hover:ring-emerald-700" />
@@ -133,7 +133,7 @@ function Karsilama() {
             {/* Keşfet */}
             <Link
               href="/kesfet"
-              className="group md:col-span-3 rounded-3xl bg-white border border-stone-200 p-7 sm:p-8 flex flex-col justify-between min-h-72 hover:border-emerald-600 transition-colors overflow-hidden"
+              className="group kalkar md:col-span-3 rounded-3xl bg-white border border-stone-200 p-7 sm:p-8 flex flex-col justify-between min-h-72 hover:border-emerald-600 transition-colors overflow-hidden"
             >
               <div className="flex gap-3 -mr-24">
                 {(["fener", "sehir", "gunes", "ay", "sandalye"] as const).map((s, i) => (
@@ -161,7 +161,7 @@ function Karsilama() {
             {/* Salon puanları */}
             <Link
               href="/salonlar"
-              className="group md:col-span-2 rounded-3xl bg-kum p-7 flex flex-col justify-between min-h-64 hover:bg-stone-200 transition-colors"
+              className="group kalkar md:col-span-2 rounded-3xl bg-kum p-7 flex flex-col justify-between min-h-64 hover:bg-stone-200 transition-colors"
             >
               <div className="flex items-end gap-3">
                 <span
@@ -190,7 +190,7 @@ function Karsilama() {
             {/* Ben Kimim */}
             <Link
               href="/oyun"
-              className="group md:col-span-2 rounded-3xl perde-zemin text-stone-50 p-7 flex flex-col justify-between min-h-64 relative overflow-hidden"
+              className="group kalkar md:col-span-2 rounded-3xl perde-zemin text-stone-50 p-7 flex flex-col justify-between min-h-64 relative overflow-hidden"
             >
               <div className="absolute inset-x-0 top-0 h-3 ampuller opacity-70" aria-hidden />
               <div className="w-20 h-24 rounded-xl bg-stone-50 text-perde-900 flex items-center justify-center rotate-[-6deg] group-hover:rotate-[4deg] transition-transform duration-300 mt-3">
@@ -207,7 +207,7 @@ function Karsilama() {
             {/* Cosplay */}
             <Link
               href="/cosplay"
-              className="group md:col-span-2 rounded-3xl bg-white border border-stone-200 p-7 flex flex-col justify-between min-h-64 hover:border-emerald-600 transition-colors"
+              className="group kalkar md:col-span-2 rounded-3xl bg-white border border-stone-200 p-7 flex flex-col justify-between min-h-64 hover:border-emerald-600 transition-colors"
             >
               <div className="flex items-center gap-4">
                 <div className="text-center leading-none bg-emerald-50 rounded-2xl px-4 py-3">
@@ -232,7 +232,7 @@ function Karsilama() {
       {/* Nasıl çalışır */}
       <section className="px-4 sm:px-6 py-20 bg-white border-y border-stone-200">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl md:text-5xl font-bold text-stone-900 text-center mb-14">
+          <h2 className="goster text-4xl md:text-5xl font-bold text-stone-900 text-center mb-14">
             Üç adımda perde açılır
           </h2>
           <ol className="grid grid-cols-1 md:grid-cols-3 gap-10">
@@ -241,7 +241,7 @@ function Karsilama() {
               { baslik: "Zevkini göster", metin: "Sevdiklerini favorile, izlediklerini puanla. Vitrinin sensin." },
               { baslik: "Eşleş", metin: "Sana en yakın zevkteki insanları gör; beğen, konuş, birlikte oyna." },
             ].map((a, i) => (
-              <li key={a.baslik} className="text-center md:text-left">
+              <li key={a.baslik} className="goster text-center md:text-left">
                 <span
                   className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-kum font-display text-2xl font-bold text-stone-800 mb-4"
                   aria-hidden
@@ -258,7 +258,7 @@ function Karsilama() {
 
       {/* Davet bileti */}
       <section className="px-4 sm:px-6 py-20">
-        <Bilet ton="zumrut" centik="50%" className="max-w-4xl mx-auto">
+        <Bilet ton="zumrut" centik="50%" className="goster max-w-4xl mx-auto">
           <div className="px-6 sm:px-12 py-12 text-center">
             <p className="text-xs font-bold uppercase tracking-[0.22em] text-emerald-100 mb-3">
               Davetiye · tek kişilik
@@ -290,6 +290,7 @@ function HeroKolaj() {
 
       {/* Eşleşme kartı */}
       <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[54%] animate-belir [animation-delay:520ms]">
+        <div className="animate-suzul">
         <div className="bg-stone-50 text-stone-900 rounded-3xl shadow-afis p-5">
           <div className="flex items-center justify-center">
             <Avatar ad="Deniz" boyut="lg" className="ring-4 ring-stone-50" />
@@ -318,6 +319,7 @@ function HeroKolaj() {
               </span>
             ))}
           </div>
+        </div>
         </div>
       </div>
     </div>
@@ -478,7 +480,7 @@ async function GirisliAnaSayfa({ userId }: { userId: string }) {
               <Link
                 key={k.href}
                 href={k.href}
-                className="group relative bg-white border border-stone-200 hover:border-emerald-600 hover:shadow-kart transition-all rounded-2xl p-5 flex items-start gap-4"
+                className="group kalkar relative bg-white border border-stone-200 hover:border-emerald-600 rounded-2xl p-5 flex items-start gap-4"
               >
                 <span className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-emerald-50 text-emerald-700 shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
                   <k.icon className="w-5 h-5" />

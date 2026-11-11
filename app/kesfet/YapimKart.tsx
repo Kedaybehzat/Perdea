@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Heart, Star } from "lucide-react";
 import { favoriDegistir, puanKaydet, puanTemizle } from "./actions";
 import type { TmdbYapim } from "@/lib/tmdb";
+import AfisYok from "@/components/ui/AfisYok";
 
 type Props = {
   yapim: TmdbYapim;
@@ -20,6 +22,7 @@ export default function YapimKart({
   puanBaslangic,
   girisli,
 }: Props) {
+  const router = useRouter();
   const [favori, setFavori] = useState(favoriBaslangic);
   const [puan, setPuan] = useState<number | null>(puanBaslangic);
   const [puanAcik, setPuanAcik] = useState(false);
@@ -27,7 +30,7 @@ export default function YapimKart({
 
   function kalpTikla() {
     if (!girisli) {
-      window.location.href = "/giris";
+      router.push("/giris");
       return;
     }
     const yeni = !favori;
@@ -40,7 +43,7 @@ export default function YapimKart({
 
   function puanaBas(deger: number) {
     if (!girisli) {
-      window.location.href = "/giris";
+      router.push("/giris");
       return;
     }
     const oncekiPuan = puan;
@@ -63,8 +66,8 @@ export default function YapimKart({
   }
 
   return (
-    <article className="group relative bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="relative aspect-[2/3] bg-stone-100">
+    <article className="group relative">
+      <div className="afis aspect-[2/3]">
         {posterUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -74,64 +77,72 @@ export default function YapimKart({
             loading="lazy"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs text-center px-2">
-            Poster yok
-          </div>
+          <AfisYok baslik={yapim.baslik} />
         )}
+
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
+        <span className="absolute bottom-2 left-2.5 flex items-center gap-1 text-xs font-semibold text-white">
+          <Star className="w-3.5 h-3.5 fill-altin text-altin" />
+          {yapim.tmdbPuani ? yapim.tmdbPuani.toFixed(1) : "—"}
+        </span>
 
         <button
           type="button"
           onClick={kalpTikla}
           disabled={bekle}
           aria-label={favori ? "Favoriden çıkar" : "Favoriye ekle"}
-          className={`absolute top-2 right-2 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm transition-colors ${
+          aria-pressed={favori}
+          className={`absolute top-2 right-2 w-10 h-10 rounded-full flex items-center justify-center backdrop-blur-sm transition-colors ${
             favori
               ? "bg-rose-600 text-white hover:bg-rose-700"
-              : "bg-white/80 text-stone-600 hover:bg-white"
+              : "bg-black/35 text-white hover:bg-black/55"
           }`}
         >
-          <Heart className={`w-4 h-4 ${favori ? "fill-current" : ""}`} />
+          <Heart key={String(favori)} className={`w-5 h-5 ${favori ? "fill-current animate-zipla" : ""}`} />
         </button>
 
         {puan !== null && (
-          <span className="absolute top-2 left-2 bg-emerald-600 text-white text-sm font-bold px-2 py-0.5 rounded-md shadow">
+          <span
+            key={puan}
+            className="animate-zipla absolute top-2 left-2 bg-altin text-perde-950 text-sm font-bold min-w-8 h-8 px-2 rounded-full flex items-center justify-center shadow"
+            title="Senin puanın"
+          >
             {puan}
           </span>
         )}
       </div>
 
-      <div className="p-3">
-        <h3 className="font-semibold text-stone-900 text-sm line-clamp-1" title={yapim.baslik}>
+      <div className="pt-3">
+        <h3 className="font-semibold text-stone-900 leading-snug line-clamp-1" title={yapim.baslik}>
           {yapim.baslik}
         </h3>
-        <div className="flex items-center justify-between mt-1 text-xs text-stone-500">
-          <span>
-            {yapim.yil ?? "—"} · {yapim.tur}
-          </span>
-          <span className="flex items-center gap-0.5">
-            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-            {yapim.tmdbPuani ? yapim.tmdbPuani.toFixed(1) : "—"}
-          </span>
-        </div>
+        <p className="mt-0.5 text-sm text-stone-500">
+          {yapim.yil ?? "—"} · {yapim.tur === "film" ? "Film" : "Dizi"}
+        </p>
 
-        <div className="mt-3 relative">
+        <div className="mt-2 relative">
           <button
             type="button"
             onClick={() => setPuanAcik((o) => !o)}
-            className="w-full text-xs font-medium border border-stone-300 hover:border-emerald-600 hover:text-emerald-700 text-stone-700 rounded-lg py-1.5 transition-colors"
+            aria-expanded={puanAcik}
+            className={`w-full text-sm font-semibold rounded-lg py-1.5 border transition-colors ${
+              puan !== null
+                ? "border-altin/60 bg-amber-50 text-altin-koyu"
+                : "border-stone-300 text-stone-700 hover:border-emerald-600 hover:text-emerald-700"
+            }`}
           >
-            {puan !== null ? `Puanın: ${puan}` : "Puan ver"}
+            {puan !== null ? `Puanın: ${puan}/10` : "Puan ver"}
           </button>
 
           {puanAcik && (
-            <div className="absolute left-0 right-0 bottom-full mb-2 bg-white border border-stone-200 rounded-lg shadow-lg p-2 z-10">
+            <div className="animate-belir absolute left-0 right-0 bottom-full mb-2 bg-white border border-stone-200 rounded-xl shadow-kart p-2 z-10">
               <div className="grid grid-cols-5 gap-1">
                 {Array.from({ length: 10 }, (_, i) => i + 1).map((n) => (
                   <button
                     key={n}
                     type="button"
                     onClick={() => puanaBas(n)}
-                    className={`text-xs py-1.5 rounded transition-colors ${
+                    className={`text-sm font-semibold py-1.5 rounded-md transition-colors ${
                       puan === n
                         ? "bg-emerald-600 text-white"
                         : "hover:bg-emerald-50 text-stone-700"

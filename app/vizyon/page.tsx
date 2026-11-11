@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { Calendar, Clapperboard, Sparkles, Star } from "lucide-react";
+import { Armchair, Clapperboard, Star } from "lucide-react";
+import PerdeBandi from "@/components/ui/PerdeBandi";
+import BosDurum from "@/components/ui/BosDurum";
+import AfisYok from "@/components/ui/AfisYok";
 import {
   vizyondakiFilmler,
   yakindaFilmler,
@@ -25,36 +28,38 @@ export default async function VizyonSayfasi() {
 
   return (
     <main className="bg-stone-50 min-h-screen">
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-2 flex items-center gap-2">
-            Vizyon
-            <Clapperboard className="w-7 h-7 text-emerald-600" />
-          </h1>
-          <p className="text-stone-600">
-            Türkiye vizyonundaki filmler ve yakında gelecekler.
-          </p>
-        </div>
+      <PerdeBandi
+        ampul
+        ustEtiket="Vizyon"
+        baslik="Bu hafta"
+        vurgu="perdede"
+        aciklama="Türkiye'de gösterimde olanlar ve sıradaki vizyon dalgası."
+      >
+        <Link href="/salonlar" className="dugme bg-altin! text-perde-950! hover:brightness-105 shadow-none!">
+          <Armchair className="w-4 h-4" />
+          Nerede izlesem?
+        </Link>
+      </PerdeBandi>
 
+      <div className="max-w-6xl mx-auto px-6 py-10">
         <Bolum
           baslik="Şu an vizyonda"
-          aciklama="Sinemalarda gösterimde — TR bölgesi."
-          icon={<Sparkles className="w-5 h-5 text-emerald-600" />}
+          aciklama="Sinemalarda gösterimde."
           filmler={simdi}
-          bosMesaj="Bu hafta TMDB'de TR bölgesi için vizyondaki film bulunamadı."
+          bosMesaj="Bu hafta için vizyon listesi gelmedi. Biraz sonra yeniden dene."
         />
 
-        <div className="mt-12">
+        <div className="mt-14 goster">
           <Bolum
             baslik="Yakında"
-            aciklama="Takvimdeki bir sonraki vizyon dalgası."
-            icon={<Calendar className="w-5 h-5 text-emerald-600" />}
+            aciklama="Takvimde sırada bekleyenler."
             filmler={yakinda}
-            bosMesaj="Yakında vizyona girecek film yok görünüyor."
+            bosMesaj="Yakında vizyona girecek film görünmüyor."
+            tarihli
           />
         </div>
 
-        <p className="text-center text-xs text-stone-400 mt-10">
+        <p className="text-center text-xs text-stone-400 mt-12">
           Film verileri TMDB tarafından sağlanır.
         </p>
       </div>
@@ -65,34 +70,29 @@ export default async function VizyonSayfasi() {
 function Bolum({
   baslik,
   aciklama,
-  icon,
   filmler,
   bosMesaj,
+  tarihli = false,
 }: {
   baslik: string;
   aciklama: string;
-  icon: React.ReactNode;
   filmler: TmdbYapim[];
   bosMesaj: string;
+  tarihli?: boolean;
 }) {
   return (
     <section>
-      <div className="mb-4">
-        <h2 className="text-xl font-semibold text-stone-900 flex items-center gap-2">
-          {icon}
-          {baslik}
-        </h2>
-        <p className="text-sm text-stone-500 mt-1">{aciklama}</p>
+      <div className="mb-5 flex items-baseline gap-3 flex-wrap">
+        <h2 className="text-3xl font-bold text-stone-900">{baslik}</h2>
+        <p className="text-stone-500">{aciklama}</p>
       </div>
 
       {filmler.length === 0 ? (
-        <div className="text-center py-12 bg-white border border-stone-200 rounded-2xl">
-          <p className="text-stone-500">{bosMesaj}</p>
-        </div>
+        <BosDurum icon={Clapperboard} baslik="Liste boş" aciklama={bosMesaj} />
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+        <div className="sirali grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-x-5 gap-y-8">
           {filmler.map((f) => (
-            <FilmKart key={f.id} film={f} />
+            <FilmKart key={f.id} film={f} tarihli={tarihli} />
           ))}
         </div>
       )}
@@ -100,36 +100,33 @@ function Bolum({
   );
 }
 
-function FilmKart({ film }: { film: TmdbYapim }) {
+function FilmKart({ film, tarihli }: { film: TmdbYapim; tarihli: boolean }) {
   const url = posterUrl(film.posterYolu, "w342");
   return (
-    <article className="group bg-white border border-stone-200 rounded-xl overflow-hidden hover:shadow-lg transition-shadow">
-      <div className="aspect-[2/3] bg-stone-100">
+    <article className="group">
+      <div className="afis aspect-[2/3]">
         {url ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={url}
-            alt={film.baslik}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
+          <img src={url} alt={film.baslik} className="w-full h-full object-cover" loading="lazy" />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs p-2 text-center">
-            Poster yok
-          </div>
+          <AfisYok baslik={film.baslik} />
+        )}
+        <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/70 to-transparent pointer-events-none" />
+        <span className="absolute bottom-2 left-2.5 flex items-center gap-1 text-xs font-semibold text-white">
+          <Star className="w-3.5 h-3.5 fill-altin text-altin" />
+          {film.tmdbPuani ? film.tmdbPuani.toFixed(1) : "—"}
+        </span>
+        {tarihli && (
+          <span className="absolute top-2 left-2 bg-altin text-perde-950 text-[11px] font-bold uppercase tracking-wider px-2 py-1 rounded-md">
+            Yakında
+          </span>
         )}
       </div>
-      <div className="p-3">
-        <h3 className="font-semibold text-stone-900 text-sm line-clamp-1" title={film.baslik}>
+      <div className="pt-3">
+        <h3 className="font-semibold text-stone-900 leading-snug line-clamp-1" title={film.baslik}>
           {film.baslik}
         </h3>
-        <div className="flex items-center justify-between mt-1 text-xs text-stone-500">
-          <span>{film.yil ?? "—"}</span>
-          <span className="flex items-center gap-0.5">
-            <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-            {film.tmdbPuani ? film.tmdbPuani.toFixed(1) : "—"}
-          </span>
-        </div>
+        <p className="mt-0.5 text-sm text-stone-500">{film.yil ?? "—"}</p>
       </div>
     </article>
   );

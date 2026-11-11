@@ -87,7 +87,7 @@ export default function DuzenleFormu({ baslangic, hata }: Props) {
       <div className="flex items-center gap-3 pt-2">
         <button
           type="submit"
-          className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-6 py-2.5 rounded-lg transition-colors"
+          className="dugme"
         >
           Kaydet
         </button>

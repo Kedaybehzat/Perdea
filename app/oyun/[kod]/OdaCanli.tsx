@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Check, Copy, Crown, Flag, HelpCircle, LogOut, RotateCcw, SkipForward, Trophy, UserMinus, X,
 } from "lucide-react";
+import Konfeti from "@/components/ui/Konfeti";
 import type { Cevap, OdaDurumu, OdaHamlesi, OdaOyuncusu } from "@/lib/oyun-tipleri";
 import { oyuncuAdi } from "@/lib/oyun-tipleri";
 import Avatar from "@/components/ui/Avatar";
@@ -411,7 +412,10 @@ function SoruTahminFormu({ kod }: { kod: string }) {
 
   return (
     <div>
-      <p className="text-xs font-bold uppercase tracking-[0.18em] text-emerald-700 mb-2">Sıra sende</p>
+      <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.18em] text-emerald-700 mb-2">
+        <span className="w-2 h-2 rounded-full bg-emerald-500 animate-nabiz" aria-hidden />
+        Sıra sende
+      </p>
       <h2 className="text-3xl font-bold text-stone-900 mb-5">
         {mod === "soru" ? "Bir evet/hayır sorusu sor" : "Kim olduğunu tahmin et"}
       </h2>
@@ -656,8 +660,9 @@ function Bitis({ durum, kurucuyum }: { durum: OdaDurumu; kurucuyum: boolean }) {
 
   return (
     <Panel>
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-altin/20 text-altin-koyu mb-3">
+      <div className="relative text-center mb-8">
+        {kazanan?.user_id === ben && <Konfeti />}
+        <div className="animate-zipla inline-flex items-center justify-center w-16 h-16 rounded-full bg-altin/20 text-altin-koyu mb-3">
           <Trophy className="w-8 h-8" />
         </div>
         <h2 className="text-4xl font-bold text-stone-900">

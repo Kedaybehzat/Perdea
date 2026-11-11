@@ -34,6 +34,8 @@ Client bileşeni server lib'i import edemez → tipler/sabitler `*-tipleri.ts` d
 - Sayfa üst bandı: `perde-zemin` (koyu yeşil perde) + beyaz serif başlık; vurgu kelimesi italik `text-emerald-300`.
 - Kartlar: `bg-white border border-stone-200 rounded-3xl`; bilet görünümü için `components/ui/Bilet.tsx`.
 - Form: `className="alan"`, birincil düğme `dugme`, ikincil `dugme-cizgi`. Mesajlar `FormMesaji`, boş durum `BosDurum`, avatar `Avatar`.
+- Sayfa üst bandı için hazır bileşen: `components/ui/PerdeBandi.tsx`. Poster kutusu: `className="afis aspect-[2/3]"`, poster yoksa `AfisYok`.
+- Hareket: liste/ızgara girişinde `sirali`, kaydırınca gelen blokta `goster`, tıklanabilir kartta `kalkar`, seçim/başarı anında `animate-zipla`. Yeni keyframe yazmadan önce `globals.css` "Hareket" bölümüne bak. Hepsi reduced-motion'da kapanır; süs için sürekli dönen/zıplayan şey ekleme.
 - Mor gradyan, emoji ikon, gölgeli "cam" kart kullanma; ikonlar lucide-react.
 
 ## Test notu

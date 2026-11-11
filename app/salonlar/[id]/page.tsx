@@ -72,7 +72,7 @@ export default async function SalonDetaySayfasi({ params }: Props) {
                         </div>
                         <div className="h-1.5 rounded-full bg-white/15 overflow-hidden">
                           <div
-                            className="h-full rounded-full bg-altin"
+                            className="h-full rounded-full bg-altin origin-left animate-[cubuk_0.9s_cubic-bezier(0.2,0.7,0.2,1)_0.15s_both]"
                             style={{ width: `${((v ?? 0) / 5) * 100}%` }}
                           />
                         </div>

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Calendar, Pencil, Star, Heart, Film, Users, Flame } from "lucide-react";
+import { Calendar, Pencil, Star, Heart, Film, Flame } from "lucide-react";
+import AfisYok from "@/components/ui/AfisYok";
 import { yapimlariIdyeGoreCek, posterUrl, tmdbHazirMi } from "@/lib/tmdb";
 
 export const metadata = {
@@ -74,7 +75,7 @@ export default async function ProfilSayfasi() {
     <main className="bg-stone-50 min-h-screen">
       {/* Kapak + avatar */}
       <div className="relative">
-        <div className="h-48 md:h-56 bg-gradient-to-br from-emerald-700 via-emerald-600 to-emerald-800" />
+        <div className="perde-zemin h-48 md:h-56" />
         <div className="max-w-6xl mx-auto px-6">
           <div className="-mt-16 md:-mt-20 flex items-end gap-5">
             <div className="relative shrink-0">
@@ -83,17 +84,16 @@ export default async function ProfilSayfasi() {
                 <img
                   src={avatarUrl}
                   alt={goruntuAdi}
-                  className="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-white object-cover bg-stone-200"
+                  className="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-stone-50 object-cover bg-stone-200 shadow-kart"
                 />
               ) : (
-                <div className="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-white bg-emerald-100 text-emerald-700 flex items-center justify-center text-5xl font-bold">
+                <div className="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-stone-50 bg-emerald-100 text-emerald-800 flex items-center justify-center text-6xl font-display font-bold shadow-kart">
                   {bastHarf}
                 </div>
               )}
-              <span className="absolute bottom-2 right-2 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white" />
             </div>
-            <div className="pb-2 flex-1 min-w-0">
-              <h1 className="text-3xl md:text-4xl font-bold text-stone-900 truncate">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-3xl md:text-4xl font-bold text-stone-900 truncate leading-tight">
                 {goruntuAdi}
               </h1>
               {kullaniciAdi && (
@@ -112,21 +112,21 @@ export default async function ProfilSayfasi() {
               <p className="text-stone-700 leading-relaxed max-w-2xl">{bio}</p>
             ) : (
               <p className="text-stone-400 italic max-w-2xl">
-                Henüz bir bio yok. "Profili Düzenle"den kendini anlatabilirsin.
+                Henüz kendini anlatmadın. Profili düzenle’den iki satır yaz; eşleşmelerin ilk onu okuyor.
               </p>
             )}
             <div className="mt-3 flex flex-wrap gap-2">
               {uyelikTarihi && (
                 <span className="inline-flex items-center gap-1.5 text-xs text-stone-600 bg-white border border-stone-200 px-3 py-1.5 rounded-full">
                   <Calendar className="w-3.5 h-3.5" />
-                  {uyelikTarihi}'den beri üye
+                  {uyelikTarihi}’den beri üye
                 </span>
               )}
             </div>
           </div>
           <Link
             href="/profil/duzenle"
-            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors shrink-0"
+            className="dugme shrink-0"
           >
             <Pencil className="w-4 h-4" />
             Profili Düzenle
@@ -139,9 +139,9 @@ export default async function ProfilSayfasi() {
         {/* Sol / orta */}
         <div className="lg:col-span-2 space-y-6">
           {/* Favori Vitrini */}
-          <section className="bg-white border border-stone-200 rounded-2xl p-6">
+          <section className="bg-white border border-stone-200 rounded-3xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-stone-900 flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-stone-900 flex items-center gap-2">
                 <Star className="w-5 h-5 text-emerald-600" />
                 Favori Vitrini
               </h2>
@@ -150,7 +150,7 @@ export default async function ProfilSayfasi() {
               </Link>
             </div>
             {favoriler && favoriler.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="sirali grid grid-cols-2 md:grid-cols-4 gap-4">
                 {favoriler.map((f) => (
                   <PosterKart
                     key={f.movie_id}
@@ -171,9 +171,9 @@ export default async function ProfilSayfasi() {
           </section>
 
           {/* Puanladıklarım */}
-          <section className="bg-white border border-stone-200 rounded-2xl p-6">
+          <section className="bg-white border border-stone-200 rounded-3xl p-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-stone-900 flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-stone-900 flex items-center gap-2">
                 <Film className="w-5 h-5 text-emerald-600" />
                 Puanladıklarım
               </h2>
@@ -184,7 +184,7 @@ export default async function ProfilSayfasi() {
               ) : null}
             </div>
             {puanlar && puanlar.length > 0 ? (
-              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              <div className="sirali grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
                 {puanlar.map((p) => (
                   <PuanKart
                     key={p.movie_id}
@@ -208,7 +208,7 @@ export default async function ProfilSayfasi() {
 
         {/* Sağ sidebar */}
         <aside className="space-y-6">
-          <section className="bg-white border border-stone-200 rounded-2xl p-6">
+          <section className="bg-white border border-stone-200 rounded-3xl p-6">
             <h3 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
               Profil Özeti
             </h3>
@@ -228,30 +228,7 @@ export default async function ProfilSayfasi() {
                 etiket="Ortalama puan"
                 deger={ortalamaPuan}
               />
-              <OzetSatiri
-                icon={<Users className="w-4 h-4" />}
-                etiket="Eşleşme"
-                deger="—"
-              />
             </div>
-          </section>
-
-          <section className="bg-white border border-stone-200 rounded-2xl p-6">
-            <h3 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
-              En Aktif Türlerin
-            </h3>
-            <p className="text-sm text-stone-400">
-              Birkaç yapım puanladıktan sonra türler burada ortaya çıkacak.
-            </p>
-          </section>
-
-          <section className="bg-white border border-stone-200 rounded-2xl p-6">
-            <h3 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
-              Son Aktiviteler
-            </h3>
-            <p className="text-sm text-stone-400">
-              Aktivite akışı yakında — favori ekle, puan ver, eşleş.
-            </p>
           </section>
         </aside>
       </div>
@@ -301,7 +278,7 @@ function BosDurum({
       <p className="text-sm text-stone-500 mb-4 max-w-sm mx-auto">{aciklama}</p>
       <Link
         href={butonLink}
-        className="inline-block text-sm bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg transition-colors"
+        className="dugme text-sm py-2!"
       >
         {buton}
       </Link>
@@ -314,16 +291,14 @@ type YapimOzet = { baslik: string; posterYolu: string | null; yil: number | null
 function PosterKart({ movieId, yapim }: { movieId: number; yapim?: YapimOzet }) {
   const url = yapim ? posterUrl(yapim.posterYolu, "w342") : null;
   return (
-    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-stone-200 border border-stone-200">
+    <div className="afis aspect-[2/3]">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt={yapim?.baslik ?? `#${movieId}`} className="w-full h-full object-cover" />
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs text-center p-2">
-          {yapim?.baslik ?? `#${movieId}`}
-        </div>
+        <AfisYok baslik={yapim?.baslik ?? "Yapım"} />
       )}
-      {yapim?.baslik && (
+      {yapim?.baslik && url && (
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2">
           <p className="text-white text-xs font-medium line-clamp-1">{yapim.baslik}</p>
         </div>
@@ -343,16 +318,14 @@ function PuanKart({
 }) {
   const url = yapim ? posterUrl(yapim.posterYolu, "w185") : null;
   return (
-    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-stone-200 border border-stone-200">
+    <div className="afis aspect-[2/3]">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt={yapim?.baslik ?? `#${movieId}`} className="w-full h-full object-cover" />
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs p-2 text-center">
-          {yapim?.baslik ?? `#${movieId}`}
-        </div>
+        <AfisYok baslik={yapim?.baslik ?? "Yapım"} />
       )}
-      <span className="absolute top-1.5 right-1.5 bg-emerald-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-md shadow">
+      <span className="absolute top-1.5 right-1.5 bg-altin text-perde-950 text-xs font-bold min-w-6 h-6 px-1.5 rounded-full flex items-center justify-center shadow">
         {score}
       </span>
     </div>

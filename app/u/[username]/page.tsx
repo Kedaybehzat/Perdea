@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { Calendar, Star, Heart, Film, Flame, UserPlus, Sparkles } from "lucide-react";
+import AfisYok from "@/components/ui/AfisYok";
 import { yapimlariIdyeGoreCek, posterUrl, tmdbHazirMi } from "@/lib/tmdb";
 
 type Props = {
@@ -92,7 +93,7 @@ export default async function KamuProfilSayfasi({ params }: Props) {
   return (
     <main className="bg-stone-50 min-h-screen">
       <div className="relative">
-        <div className="h-48 md:h-56 bg-gradient-to-br from-emerald-700 via-emerald-600 to-emerald-800" />
+        <div className="perde-zemin h-48 md:h-56" />
         <div className="max-w-6xl mx-auto px-6">
           <div className="-mt-16 md:-mt-20 flex items-end gap-5">
             <div className="shrink-0">
@@ -104,13 +105,13 @@ export default async function KamuProfilSayfasi({ params }: Props) {
                   className="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-white object-cover bg-stone-200"
                 />
               ) : (
-                <div className="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-white bg-emerald-100 text-emerald-700 flex items-center justify-center text-5xl font-bold">
+                <div className="w-32 h-32 md:w-36 md:h-36 rounded-full border-4 border-stone-50 bg-emerald-100 text-emerald-800 flex items-center justify-center text-6xl font-display font-bold shadow-kart">
                   {bastHarf}
                 </div>
               )}
             </div>
-            <div className="pb-2 flex-1 min-w-0">
-              <h1 className="text-3xl md:text-4xl font-bold text-stone-900 truncate">
+            <div className="flex-1 min-w-0">
+              <h1 className="text-3xl md:text-4xl font-bold text-stone-900 truncate leading-tight">
                 {goruntuAdi}
               </h1>
               <p className="text-stone-500 text-sm">@{profil.username}</p>
@@ -154,7 +155,7 @@ export default async function KamuProfilSayfasi({ params }: Props) {
           ) : benim ? (
             <button
               type="button"
-              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors shrink-0"
+              className="dugme shrink-0"
               title="Arkadaşlık özelliği yakında"
             >
               <UserPlus className="w-4 h-4" />
@@ -163,7 +164,7 @@ export default async function KamuProfilSayfasi({ params }: Props) {
           ) : (
             <Link
               href="/giris"
-              className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors shrink-0"
+              className="dugme shrink-0"
             >
               Takip etmek için giriş yap
             </Link>
@@ -173,8 +174,8 @@ export default async function KamuProfilSayfasi({ params }: Props) {
 
       <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <section className="bg-white border border-stone-200 rounded-2xl p-6">
-            <h2 className="text-lg font-semibold text-stone-900 flex items-center gap-2 mb-4">
+          <section className="bg-white border border-stone-200 rounded-3xl p-6">
+            <h2 className="text-2xl font-bold text-stone-900 flex items-center gap-2 mb-4">
               <Star className="w-5 h-5 text-emerald-600" />
               Favori Vitrini
             </h2>
@@ -193,8 +194,8 @@ export default async function KamuProfilSayfasi({ params }: Props) {
             )}
           </section>
 
-          <section className="bg-white border border-stone-200 rounded-2xl p-6">
-            <h2 className="text-lg font-semibold text-stone-900 flex items-center gap-2 mb-4">
+          <section className="bg-white border border-stone-200 rounded-3xl p-6">
+            <h2 className="text-2xl font-bold text-stone-900 flex items-center gap-2 mb-4">
               <Film className="w-5 h-5 text-emerald-600" />
               Puanladıkları
             </h2>
@@ -216,7 +217,7 @@ export default async function KamuProfilSayfasi({ params }: Props) {
         </div>
 
         <aside className="space-y-6">
-          <section className="bg-white border border-stone-200 rounded-2xl p-6">
+          <section className="bg-white border border-stone-200 rounded-3xl p-6">
             <h3 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-4">
               Profil Özeti
             </h3>
@@ -261,16 +262,14 @@ type YapimOzet = { baslik: string; posterYolu: string | null; yil: number | null
 function PosterKart({ movieId, yapim }: { movieId: number; yapim?: YapimOzet }) {
   const url = yapim ? posterUrl(yapim.posterYolu, "w342") : null;
   return (
-    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-stone-200 border border-stone-200">
+    <div className="afis aspect-[2/3]">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt={yapim?.baslik ?? `#${movieId}`} className="w-full h-full object-cover" />
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs text-center p-2">
-          {yapim?.baslik ?? `#${movieId}`}
-        </div>
+        <AfisYok baslik={yapim?.baslik ?? "Yapım"} />
       )}
-      {yapim?.baslik && (
+      {yapim?.baslik && url && (
         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 to-transparent p-2">
           <p className="text-white text-xs font-medium line-clamp-1">{yapim.baslik}</p>
         </div>
@@ -282,16 +281,14 @@ function PosterKart({ movieId, yapim }: { movieId: number; yapim?: YapimOzet }) 
 function PuanKart({ movieId, score, yapim }: { movieId: number; score: number; yapim?: YapimOzet }) {
   const url = yapim ? posterUrl(yapim.posterYolu, "w185") : null;
   return (
-    <div className="relative aspect-[2/3] rounded-lg overflow-hidden bg-stone-200 border border-stone-200">
+    <div className="afis aspect-[2/3]">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={url} alt={yapim?.baslik ?? `#${movieId}`} className="w-full h-full object-cover" />
       ) : (
-        <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs p-2 text-center">
-          {yapim?.baslik ?? `#${movieId}`}
-        </div>
+        <AfisYok baslik={yapim?.baslik ?? "Yapım"} />
       )}
-      <span className="absolute top-1.5 right-1.5 bg-emerald-600 text-white text-xs font-bold px-1.5 py-0.5 rounded-md shadow">
+      <span className="absolute top-1.5 right-1.5 bg-altin text-perde-950 text-xs font-bold min-w-6 h-6 px-1.5 rounded-full flex items-center justify-center shadow">
         {score}
       </span>
     </div>

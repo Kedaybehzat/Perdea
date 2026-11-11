@@ -36,7 +36,8 @@ Eski `~/Desktop/projects/perdea2` iCloud sync tuzağı yüzünden taşındı (`t
 - **Tasarım sistemi** yenilendi: `app/globals.css` (Fraunces + Figtree, `public/fonts/` içinde self-host; perde-* yeşilleri, altin, `bilet`/`perde-zemin`/`ampuller`/`alan`/`dugme` utility'leri). Ortak parçalar `components/ui/`. Header/Footer/MobilMenu/landing/giriş/kayıt yeniden yazıldı. Nav tek yerden: `components/navigasyon.ts`.
 - **Salon puanları** `/salonlar`, **Cosplay buluşmaları** `/cosplay`, **Ben Kimim? odaları** `/oyun` — full-stack. Ayrıntı: `gorevler/salon-cosplay-oyun.md`.
 - **DB:** `docs/migrations/2026-11-11_salon_cosplay_oyun.sql` Supabase SQL Editor'de BİR KEZ çalıştırılmalı (idempotent). Çalışmadıysa sayfalar "kurulum eksik" notu gösterir (`lib/hata.ts` → `kurulumEksikMi`).
-- Henüz eski görünümde kalan sayfalar (yalnızca font/renk devraldı): kesfet, vizyon, eslesme, profil, topluluk, baslik, sohbet.
+- **2. tur (aynı gün):** kesfet, vizyon, eslesme, profil, u/[username] yeni tasarıma geçti; hareket katmanı eklendi (`globals.css` → "Hareket" bölümü: `goster`, `sirali`, `kalkar`, `afis`, `iskelet`, `perde-acilis`, `konfeti`, `halka-dol`; sayfa geçişi `app/template.tsx`). Yeni parçalar: `PerdeBandi`, `AfisYok`, `UyumHalkasi`, `Konfeti`.
+- Hâlâ mockup/eski görünümde: topluluk, baslik, sohbet (backend'leriyle birlikte yapılacak), hakkimizda, iletisim.
 
 ## Kalan işler (sıralı)
 ### Önce Supabase'i canlı tut (blocker — bunlar çözülmeden hiçbiri çalışmaz)

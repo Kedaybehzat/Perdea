@@ -9,7 +9,7 @@ export default function SalonKarti({ salon }: { salon: SalonOzet }) {
   return (
     <Link
       href={`/salonlar/${salon.id}`}
-      className="group block transition-transform hover:-translate-y-1 focus-visible:-translate-y-1"
+      className="group block kalkar hover:shadow-none! focus-visible:-translate-y-1"
     >
       <Bilet
         ton="beyaz"

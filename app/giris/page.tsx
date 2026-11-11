@@ -1,4 +1,7 @@
+import AuthKabuk from '@/components/AuthKabuk'
 import GirisFormu from './GirisFormu'
+
+export const metadata = { title: 'Giriş Yap — Perdea' }
 
 export default async function GirisPage({
   searchParams,
@@ -9,13 +12,14 @@ export default async function GirisPage({
   const hata = params.hata
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-12 bg-stone-100">
-      <div className="w-full max-w-md">
-        <h1 className="text-4xl font-bold text-emerald-700 text-center mb-8">
-          Perdea
-        </h1>
-        <GirisFormu hata={hata} />
-      </div>
-    </main>
+    <AuthKabuk
+      slogan={
+        <>
+          Kaldığın <em className="text-emerald-300">sahneden</em> devam.
+        </>
+      }
+    >
+      <GirisFormu hata={hata} />
+    </AuthKabuk>
   )
 }

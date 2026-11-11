@@ -1,52 +1,73 @@
 import Link from "next/link";
+import Logo from "./Logo";
+
+const sutunlar = [
+  {
+    baslik: "Keşfet",
+    linkler: [
+      { href: "/kesfet", etiket: "Film, dizi, anime" },
+      { href: "/vizyon", etiket: "Vizyondakiler" },
+      { href: "/salonlar", etiket: "Salon puanları" },
+    ],
+  },
+  {
+    baslik: "Tanış",
+    linkler: [
+      { href: "/eslesme", etiket: "Eşleşmeler" },
+      { href: "/oyun", etiket: "Ben Kimim? odaları" },
+      { href: "/cosplay", etiket: "Cosplay buluşmaları" },
+    ],
+  },
+  {
+    baslik: "Topluluk",
+    linkler: [
+      { href: "/topluluk", etiket: "Akış" },
+      { href: "/baslik", etiket: "Başlıklar" },
+      { href: "/sohbet", etiket: "Sohbetler" },
+    ],
+  },
+  {
+    baslik: "Perdea",
+    linkler: [
+      { href: "/hakkimizda", etiket: "Hakkımızda" },
+      { href: "/iletisim", etiket: "İletişim" },
+    ],
+  },
+];
 
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-stone-200 mt-auto">
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
-          <div>
-            <h3 className="font-bold text-emerald-700 mb-3">Perdea</h3>
-            <p className="text-stone-600 text-sm leading-relaxed">
-              Film, dizi ve anime severler için sosyal eşleşme platformu.
+    <footer className="perde-zemin text-emerald-100/80 mt-auto">
+      <div className="film-seridi text-stone-50" />
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-10">
+          <div className="col-span-2">
+            <Logo koyuZemin />
+            <p className="mt-4 text-sm leading-relaxed max-w-xs">
+              Film, dizi ve anime tutkunlarını zevklerine göre bir araya getiren
+              Türkçe sosyal platform.
             </p>
           </div>
 
-          <div>
-            <h4 className="font-semibold text-stone-900 mb-3">Keşfet</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/kesfet" className="text-stone-600 hover:text-emerald-700">Keşfet</Link></li>
-              <li><Link href="/eslesme" className="text-stone-600 hover:text-emerald-700">Eşleş</Link></li>
-              <li><Link href="/vizyon" className="text-stone-600 hover:text-emerald-700">Vizyon</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-stone-900 mb-3">Topluluk</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/topluluk" className="text-stone-600 hover:text-emerald-700">Gruplar</Link></li>
-              <li><Link href="/topluluk" className="text-stone-600 hover:text-emerald-700">Forum</Link></li>
-              <li><Link href="/topluluk" className="text-stone-600 hover:text-emerald-700">Listeler</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-stone-900 mb-3">Perdea</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/hakkimizda" className="text-stone-600 hover:text-emerald-700">Hakkımızda</Link></li>
-              <li><Link href="/iletisim" className="text-stone-600 hover:text-emerald-700">İletişim</Link></li>
-              <li><Link href="/gizlilik" className="text-stone-600 hover:text-emerald-700">Gizlilik</Link></li>
-            </ul>
-          </div>
+          {sutunlar.map((s) => (
+            <div key={s.baslik}>
+              <h3 className="font-semibold text-stone-50 mb-3">{s.baslik}</h3>
+              <ul className="space-y-2 text-sm">
+                {s.linkler.map((l) => (
+                  <li key={l.href}>
+                    <Link href={l.href} className="hover:text-white transition-colors">
+                      {l.etiket}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
         </div>
 
-        <div className="border-t border-stone-200 pt-6 flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-stone-500 text-sm">
-            © 2026 Perdea. Tüm hakları saklıdır.
-          </p>
-          <p className="text-stone-500 text-xs italic">
-            Bu ürün TMDB API kullanmaktadır ancak TMDB tarafından onaylanmamıştır.
-          </p>
+        <div className="border-t border-white/10 pt-6 flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-emerald-100/60">
+          <p>© 2026 Perdea. Tüm hakları saklıdır.</p>
+          <p>Bu ürün TMDB API kullanmaktadır ancak TMDB tarafından onaylanmamıştır.</p>
         </div>
       </div>
     </footer>

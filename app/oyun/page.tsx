@@ -1,185 +1,197 @@
-import { redirect } from "next/navigation";
+import Link from "next/link";
+import { DoorOpen, Users } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { Gamepad2, Sparkles, Check, X, HelpCircle, Film, Trophy } from "lucide-react";
+import { acikOdalar, odalarim } from "@/lib/oyun";
+import type { OdaAsamasi } from "@/lib/oyun-tipleri";
+import { goreceli } from "@/lib/zaman";
+import BosDurum from "@/components/ui/BosDurum";
+import FormMesaji from "@/components/ui/FormMesaji";
+import KurulumNotu from "@/components/ui/KurulumNotu";
+import { KodlaKatilFormu, OdaKurFormu } from "./LobiFormlari";
+import { odayaKatilAction } from "./actions";
 
 export const metadata = {
-  title: "Karakter Oyunu — Perdea",
-  description: "Ortak favori yapımdan karakter seç, diğeri 20 soruyla bulmaya çalışsın.",
+  title: "Ben Kimim? Oyun Odaları — Perdea",
+  description:
+    "Oda kur, arkadaşlarını kodla çağır. Herkese gizli bir karakter atanır; evet/hayır sorularıyla kim olduğunu bul.",
 };
 
-type Soru = {
-  no: number;
-  soru: string;
-  cevap: "evet" | "hayır" | "belki";
+type Props = { searchParams: Promise<{ hata?: string }> };
+
+const asamaEtiketi: Record<OdaAsamasi, string> = {
+  lobi: "Lobide",
+  karakter: "Karakterler yazılıyor",
+  oyun: "Oyun sürüyor",
+  bitti: "Tur bitti",
 };
 
-const sorular: Soru[] = [
-  { no: 1, soru: "Erkek karakter misin?", cevap: "evet" },
-  { no: 2, soru: "Filmin ana karakterlerinden biri misin?", cevap: "evet" },
-  { no: 3, soru: "Filmin başında yaşıyor musun?", cevap: "evet" },
-  { no: 4, soru: "Bir uçakta görünüyor musun?", cevap: "hayır" },
-  { no: 5, soru: "Rüzgar seninle konuşuyor mu?", cevap: "belki" },
+const adimlar = [
+  { no: "1", baslik: "Oda kur ya da katıl", metin: "Kodu paylaş; 2–8 kişi aynı odada toplanın." },
+  { no: "2", baslik: "Birbirinize karakter yazın", metin: "Herkes bir başkasının alnına bir karakter yazar. Kendi karakterini göremezsin." },
+  { no: "3", baslik: "Sor, daralt, tahmin et", metin: "Sıran gelince evet/hayır sorusu sor ya da tahminini söyle. Diğerleri cevaplar." },
+  { no: "4", baslik: "İlk bilen kazanır", metin: "Herkes bulana kadar sürer. Sonra roller kayar, yeni tur başlar." },
 ];
 
-export default async function OyunSayfasi() {
+export default async function OyunLobisi({ searchParams }: Props) {
+  const { hata } = await searchParams;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/giris");
+
+  const [{ odalar, kurulumEksik }, benimOdalarim] = user
+    ? await Promise.all([acikOdalar(), odalarim()])
+    : [{ odalar: [], kurulumEksik: false }, []];
 
   return (
-    <main className="bg-stone-50 min-h-screen">
-      <div className="max-w-5xl mx-auto px-6 py-10">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-2 flex items-center gap-2">
-            Karakter Oyunu
-            <Gamepad2 className="w-7 h-7 text-emerald-600" />
-          </h1>
-          <p className="text-stone-600">
-            İkiniz de favori listenize eklediğiniz bir yapımdan karakter seçin —
-            diğeri 20 soruyla bulmaya çalışsın. "Ben kimim?" versiyonu.
+    <main className="min-h-screen">
+      {/* Tabela */}
+      <section className="perde-zemin text-stone-50 relative overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-4 ampuller opacity-80" aria-hidden />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-16 pb-14 text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-altin mb-3">
+            Oyun odaları
           </p>
-        </div>
-
-        <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-xl px-4 py-3">
-          <strong>Önizleme:</strong> Oyun altyapısı henüz bağlı değil — aşağısı
-          canlı oyun mockup'ı. Spec:{" "}
-          <code>ai_docs/gorevler/karakter-oyunu.md</code>.
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Oyun alanı */}
-          <section className="lg:col-span-2 bg-white border border-stone-200 rounded-2xl overflow-hidden">
-            <div className="p-5 bg-gradient-to-br from-emerald-700 to-emerald-800 text-white">
-              <div className="flex items-center justify-between gap-3 flex-wrap">
-                <div className="flex items-center gap-2">
-                  <Film className="w-5 h-5" />
-                  <span className="font-semibold">Rüzgarın Hatıraları</span>
-                  <span className="text-emerald-200 text-sm">· ortak favori</span>
-                </div>
-                <div className="flex items-center gap-2 text-sm bg-white/15 rounded-lg px-3 py-1">
-                  <Sparkles className="w-4 h-4" />
-                  Soru 5 / 20
-                </div>
-              </div>
-              <div className="mt-4 bg-white/10 border border-white/20 rounded-lg p-4">
-                <p className="text-xs text-emerald-100 uppercase tracking-wider mb-1">
-                  Mert A. bir karakter seçti — sen bulmaya çalışıyorsun.
-                </p>
-                <p className="text-sm">
-                  Karakter gizli. Evet/hayır sorularıyla daralt. Hak:{" "}
-                  <strong>15 soru</strong>, <strong>3 tahmin</strong>.
-                </p>
-              </div>
+          <h1 className="text-6xl md:text-7xl font-bold leading-none mb-5">
+            Ben <em className="text-emerald-300">Kimim?</em>
+          </h1>
+          <p className="text-lg text-emerald-100/85 max-w-2xl mx-auto">
+            Alnına bir karakter yazılır, herkes görür — sen hariç. Evet/hayır sorularıyla
+            kim olduğunu bul. Film, dizi, anime… ne isterseniz.
+          </p>
+          {!user && (
+            <div className="mt-8 flex items-center justify-center gap-3 flex-wrap">
+              <Link href="/kayit" className="dugme bg-stone-50! text-emerald-800! hover:bg-white!">
+                Oynamak için kayıt ol
+              </Link>
+              <Link href="/giris" className="dugme-cizgi bg-transparent! text-stone-50! border-white/30! hover:border-white!">
+                Giriş yap
+              </Link>
             </div>
+          )}
+        </div>
+        <div className="absolute inset-x-0 bottom-0 h-4 ampuller opacity-80" aria-hidden />
+      </section>
 
-            <div className="p-5 space-y-3 max-h-96 overflow-y-auto">
-              {sorular.map((s) => (
-                <SoruSatiri key={s.no} soru={s} />
-              ))}
-            </div>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 pb-10 pt-10 space-y-12">
+        {user && (
+          <>
+            {/* Kur / Katıl */}
+            <section className="grid grid-cols-1 lg:grid-cols-5 gap-6 -mt-16 relative">
+              <div className="lg:col-span-3 bg-white border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-kart">
+                <h2 className="text-2xl font-bold text-stone-900 mb-1">Yeni oda kur</h2>
+                <p className="text-stone-600 mb-5 text-sm">Oda kurulunca sana 5 haneli bir kod verilir.</p>
+                <OdaKurFormu />
+              </div>
+              <div className="lg:col-span-2 bg-kum border border-stone-200 rounded-3xl p-6 sm:p-8 shadow-kart">
+                <h2 className="text-2xl font-bold text-stone-900 mb-1">Kodun var mı?</h2>
+                <p className="text-stone-600 mb-5 text-sm">Arkadaşının gönderdiği kodu yaz.</p>
+                <KodlaKatilFormu />
+              </div>
+            </section>
 
-            <div className="border-t border-stone-200 p-4 bg-stone-50">
-              <form className="flex items-center gap-2">
-                <HelpCircle className="w-5 h-5 text-emerald-600 shrink-0" />
-                <input
-                  type="text"
-                  placeholder="Bir evet/hayır sorusu sor..."
-                  className="flex-1 px-3 py-2 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 bg-white text-sm"
+            {kurulumEksik && <KurulumNotu />}
+            {hata && <FormMesaji hata={hata} />}
+
+            {/* Odalarım */}
+            {benimOdalarim.length > 0 && (
+              <section>
+                <h2 className="text-2xl font-bold text-stone-900 mb-4">Odaların</h2>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {benimOdalarim.map((o) => (
+                    <li key={o.kod}>
+                      <Link
+                        href={`/oyun/${o.kod}`}
+                        className="block bg-white border border-stone-200 hover:border-emerald-600 rounded-2xl p-5 transition-colors"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <h3 className="font-semibold text-stone-900 truncate">{o.ad}</h3>
+                          <span className="font-mono text-sm font-bold text-emerald-700 tracking-widest">
+                            {o.kod}
+                          </span>
+                        </div>
+                        <p className="text-sm text-stone-500 mt-1">
+                          {asamaEtiketi[o.durum]} · {o.oyuncu_sayisi}/{o.kapasite} kişi ·{" "}
+                          {goreceli(o.guncellendi)}
+                        </p>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            )}
+
+            {/* Açık odalar */}
+            <section>
+              <div className="flex items-end justify-between gap-4 mb-4">
+                <h2 className="text-2xl font-bold text-stone-900">Açık odalar</h2>
+                <p className="text-sm text-stone-500">Oyuncu bekleyen herkese açık odalar</p>
+              </div>
+              {odalar.length > 0 ? (
+                <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {odalar.map((o) => {
+                    const dolu = o.oyuncu_sayisi >= o.kapasite;
+                    return (
+                      <li
+                        key={o.kod}
+                        className="bg-white border border-stone-200 rounded-2xl p-5 flex flex-col gap-3"
+                      >
+                        <div>
+                          {o.tema && (
+                            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-emerald-700 mb-1 truncate">
+                              {o.tema}
+                            </p>
+                          )}
+                          <h3 className="font-display text-xl font-bold text-stone-900 leading-snug">
+                            {o.ad}
+                          </h3>
+                          <p className="text-sm text-stone-500 mt-1">
+                            @{o.kurucu} kurdu · {goreceli(o.created_at)}
+                          </p>
+                        </div>
+                        <div className="mt-auto flex items-center justify-between gap-3">
+                          <span className="text-sm text-stone-700 flex items-center gap-1.5">
+                            <Users className="w-4 h-4 text-stone-400" />
+                            {o.oyuncu_sayisi} / {o.kapasite}
+                          </span>
+                          <form action={odayaKatilAction.bind(null, o.kod)}>
+                            <button type="submit" disabled={dolu} className="dugme py-2! px-4! text-sm">
+                              {dolu ? "Dolu" : "Katıl"}
+                            </button>
+                          </form>
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              ) : (
+                <BosDurum
+                  icon={DoorOpen}
+                  baslik="Şu an açık oda yok"
+                  aciklama="İlk odayı sen kur; kodu arkadaşlarına gönder ya da herkese açık bırak."
                 />
-                <button
-                  type="submit"
-                  className="bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-4 py-2 rounded-lg text-sm transition-colors"
+              )}
+            </section>
+          </>
+        )}
+
+        {/* Nasıl oynanır */}
+        <section>
+          <h2 className="text-3xl font-bold text-stone-900 mb-6 text-center">Nasıl oynanır?</h2>
+          <ol className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {adimlar.map((a) => (
+              <li key={a.no} className="bg-white border border-stone-200 rounded-2xl p-5">
+                <span
+                  className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-kum font-display text-xl font-bold text-stone-800 mb-3"
+                  aria-hidden
                 >
-                  Sor
-                </button>
-              </form>
-              <div className="mt-2 text-xs text-stone-500 text-center">
-                Veya doğrudan tahmin et:{" "}
-                <button className="text-emerald-700 underline font-medium">
-                  karakter adı gir
-                </button>
-              </div>
-            </div>
-          </section>
-
-          {/* Yanıtlayıcı paneli (diğer kullanıcının bakış açısı) */}
-          <aside className="space-y-4">
-            <section className="bg-white border border-stone-200 rounded-2xl p-5">
-              <h3 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-3">
-                Rakip
-              </h3>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg">
-                  M
-                </div>
-                <div>
-                  <p className="font-semibold text-stone-900">Mert A.</p>
-                  <p className="text-xs text-emerald-700 flex items-center gap-1">
-                    <Sparkles className="w-3 h-3" />
-                    %87 uyum
-                  </p>
-                </div>
-              </div>
-            </section>
-
-            <section className="bg-white border border-stone-200 rounded-2xl p-5">
-              <h3 className="text-sm font-semibold text-stone-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <Trophy className="w-4 h-4 text-emerald-600" />
-                Skor
-              </h3>
-              <div className="grid grid-cols-2 gap-3 text-center">
-                <div className="bg-stone-50 rounded-lg p-3">
-                  <p className="text-2xl font-bold text-stone-900">2</p>
-                  <p className="text-xs text-stone-500 mt-0.5">Sen</p>
-                </div>
-                <div className="bg-stone-50 rounded-lg p-3">
-                  <p className="text-2xl font-bold text-stone-900">1</p>
-                  <p className="text-xs text-stone-500 mt-0.5">Mert</p>
-                </div>
-              </div>
-            </section>
-
-            <section className="bg-emerald-50 border border-emerald-200 rounded-2xl p-5">
-              <h3 className="text-sm font-semibold text-emerald-900 mb-2">
-                Oyun nasıl çalışır?
-              </h3>
-              <ol className="text-sm text-emerald-800 space-y-1.5 list-decimal list-inside">
-                <li>Ortak bir favori yapımdan karakter seçilir.</li>
-                <li>Diğer oyuncu 20 soru + 3 tahmin hakkıyla bulmaya çalışır.</li>
-                <li>Bulursa puan, bulamazsa karakter sahibi puan.</li>
-                <li>Rolünüzü değiştirip devam edersiniz.</li>
-              </ol>
-            </section>
-          </aside>
-        </div>
+                  {a.no}
+                </span>
+                <h3 className="font-semibold text-stone-900 mb-1">{a.baslik}</h3>
+                <p className="text-sm text-stone-600 leading-relaxed">{a.metin}</p>
+              </li>
+            ))}
+          </ol>
+        </section>
       </div>
     </main>
-  );
-}
-
-function SoruSatiri({ soru }: { soru: Soru }) {
-  const renk =
-    soru.cevap === "evet"
-      ? "bg-emerald-50 border-emerald-200 text-emerald-800"
-      : soru.cevap === "hayır"
-      ? "bg-rose-50 border-rose-200 text-rose-700"
-      : "bg-amber-50 border-amber-200 text-amber-800";
-  const icon =
-    soru.cevap === "evet" ? <Check className="w-4 h-4" /> : soru.cevap === "hayır" ? <X className="w-4 h-4" /> : <HelpCircle className="w-4 h-4" />;
-  return (
-    <div className="flex items-start gap-3">
-      <span className="shrink-0 w-7 h-7 rounded-full bg-stone-100 text-stone-600 text-xs font-bold flex items-center justify-center">
-        {soru.no}
-      </span>
-      <div className="flex-1">
-        <p className="text-sm text-stone-900">{soru.soru}</p>
-      </div>
-      <span
-        className={`shrink-0 inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 rounded-full border ${renk}`}
-      >
-        {icon}
-        {soru.cevap}
-      </span>
-    </div>
   );
 }

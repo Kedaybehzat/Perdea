@@ -42,7 +42,8 @@ ai_docs/
 | Eşleşme algoritması | `core/durum.md` + `gorevler/eslesme.md` + `core/sema.md` |
 | Başlık + entry (ekşi/twitter) | `core/durum.md` + `gorevler/baslik.md` + `core/sema.md` |
 | Birebir sohbet | `core/durum.md` + `gorevler/ozel-chat.md` + `core/sema.md` |
-| Karakter / "ben kimim?" oyunu | `core/durum.md` + `gorevler/karakter-oyunu.md` + `gorevler/ozel-chat.md` |
+| Salon puanı / cosplay buluşması / Ben Kimim? odaları | `core/durum.md` + `gorevler/salon-cosplay-oyun.md` |
+| Yeni sayfa tasarlama (görsel dil) | `gorevler/salon-cosplay-oyun.md` → "Tasarım dili" + `app/globals.css` |
 | Yeni kod / yapıyı öğrenme | `core/mimari.md` |
 | Bir şey patladı / garip hata | `core/tuzaklar.md` |
 

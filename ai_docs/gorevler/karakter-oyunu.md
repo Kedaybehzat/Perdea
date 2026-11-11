@@ -1,3 +1,5 @@
+> **GEÇERSİZ (11 Kas 2026):** Oyun, sohbetten bağımsız çok oyunculu odalar olarak yapıldı. Güncel hali: `gorevler/salon-cosplay-oyun.md`. Aşağısı yalnızca tarihçe.
+
 # Görev: Karakter oyunu ("Ben kimim?" — 20 soru)
 
 **Durum:** `/oyun` UI mockup var (`app/oyun/page.tsx`), backend yok. Sohbet'in üstüne oturan bir mini-oyun.

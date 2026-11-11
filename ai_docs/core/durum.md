@@ -32,6 +32,12 @@ Eski `~/Desktop/projects/perdea2` iCloud sync tuzağı yüzünden taşındı (`t
 - **.next iCloud dışına symlink** — `~/.cache/perdea2-next-dev` → `.next` (distDir proje dışına izin vermiyor).
 - **.gitignore** — `.next` sembolik link + `*.zip` eklendi.
 
+## 11 Kas 2026 — tasarım sistemi + 3 yeni özellik (Claude)
+- **Tasarım sistemi** yenilendi: `app/globals.css` (Fraunces + Figtree, `public/fonts/` içinde self-host; perde-* yeşilleri, altin, `bilet`/`perde-zemin`/`ampuller`/`alan`/`dugme` utility'leri). Ortak parçalar `components/ui/`. Header/Footer/MobilMenu/landing/giriş/kayıt yeniden yazıldı. Nav tek yerden: `components/navigasyon.ts`.
+- **Salon puanları** `/salonlar`, **Cosplay buluşmaları** `/cosplay`, **Ben Kimim? odaları** `/oyun` — full-stack. Ayrıntı: `gorevler/salon-cosplay-oyun.md`.
+- **DB:** `docs/migrations/2026-11-11_salon_cosplay_oyun.sql` Supabase SQL Editor'de BİR KEZ çalıştırılmalı (idempotent). Çalışmadıysa sayfalar "kurulum eksik" notu gösterir (`lib/hata.ts` → `kurulumEksikMi`).
+- Henüz eski görünümde kalan sayfalar (yalnızca font/renk devraldı): kesfet, vizyon, eslesme, profil, topluluk, baslik, sohbet.
+
 ## Kalan işler (sıralı)
 ### Önce Supabase'i canlı tut (blocker — bunlar çözülmeden hiçbiri çalışmaz)
 1. [ ] **Supabase projeyi geri aç.** Dashboard → Restore (paused ise) ya da yeni proje + `docs/schema.sql` yeniden çalıştır + `.env.local`'daki URL/anon key'i yenile.
@@ -40,7 +46,7 @@ Eski `~/Desktop/projects/perdea2` iCloud sync tuzağı yüzünden taşındı (`t
 ### Backend bekleyen UI mockup'ları (spec'leri hazır)
 3. [ ] **Başlık + entry** → `gorevler/baslik.md` — basliklar/entryler/entry_begeni/baslik_takip tabloları + RLS + lib + actions.
 4. [ ] **Özel chat** → `gorevler/ozel-chat.md` — friendships/conversations/messages tabloları + RLS + Realtime subscribe + lib + actions.
-5. [ ] **Karakter oyunu** → `gorevler/karakter-oyunu.md` — games/game_secrets/game_moves tabloları + RLS + lib + actions. Sohbet önkoşul.
+5. [x] **Ben Kimim? oyun odaları** — BİTTİ (11 Kas 2026) → `gorevler/salon-cosplay-oyun.md`. Eski `karakter-oyunu.md` spec'i geçersiz.
 6. [ ] **Beğen/Geç kalıcı hale getir** (`/eslesme`) — `matches` tablosu + RLS, aynı adayı tekrar gösterme, karşılıklı beğen = eşleşme bildirim.
 
 ### Küçük işler
@@ -55,4 +61,4 @@ Eski `~/Desktop/projects/perdea2` iCloud sync tuzağı yüzünden taşındı (`t
 ## Notlar
 - Repo canlıda `Kedaybehzat/Perdea.git` (perdea2 değil).
 - `movie_id integer` TMDB id'si; favori/rating tabloları tek sütun tuttuğu için şimdilik film/dizi karışık.
-- Mockup'lı sayfalarda (`/topluluk`, `/baslik`, `/sohbet`, `/oyun`) sarı "Önizleme" kutusu var — spec dosyasına link.
+- Mockup'lı sayfalarda (`/topluluk`, `/baslik`, `/sohbet`) sarı "Önizleme" kutusu var — spec dosyasına link.

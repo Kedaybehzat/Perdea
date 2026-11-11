@@ -9,8 +9,8 @@ export default function KayitFormu({ hata }: { hata?: string }) {
   const [sifreGorunur, setSifreGorunur] = useState(false)
 
   return (
-    <div className="bg-stone-50 rounded-2xl shadow-sm border border-stone-200 p-8">
-      <h2 className="text-3xl font-bold text-stone-900 text-center mb-2">
+    <div className="bg-white rounded-3xl shadow-kart border border-stone-200 p-7 sm:p-9">
+      <h2 className="text-4xl font-bold text-stone-900 text-center mb-2">
         Kayıt Ol
       </h2>
       <p className="text-stone-600 text-center mb-8">
@@ -19,7 +19,7 @@ export default function KayitFormu({ hata }: { hata?: string }) {
 
       {/* Hata mesajı — sadece hata varsa görünür */}
       {hata && (
-        <div className="mb-6 px-4 py-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+        <div role="alert" className="mb-6 px-4 py-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
           {hata}
         </div>
       )}
@@ -33,7 +33,7 @@ export default function KayitFormu({ hata }: { hata?: string }) {
             name="email"
             placeholder="ornek@mail.com"
             required
-            className="px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 bg-white"
+            className="alan"
           />
         </div>
 
@@ -46,11 +46,12 @@ export default function KayitFormu({ hata }: { hata?: string }) {
               name="password"
               placeholder="En az 8 karakter"
               required
-              className="w-full px-4 py-3 pr-12 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 bg-white"
+              className="alan pr-12!"
             />
             <button
               type="button"
               onClick={() => setSifreGorunur(!sifreGorunur)}
+              aria-label={sifreGorunur ? 'Şifreyi gizle' : 'Şifreyi göster'}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600"
             >
               {sifreGorunur ? <EyeOff size={20} /> : <Eye size={20} />}
@@ -66,7 +67,7 @@ export default function KayitFormu({ hata }: { hata?: string }) {
             name="passwordConfirm"
             placeholder="Şifreyi tekrar gir"
             required
-            className="px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 bg-white"
+            className="alan"
           />
         </div>
 
@@ -78,13 +79,13 @@ export default function KayitFormu({ hata }: { hata?: string }) {
             name="username"
             placeholder="Kullanıcı adını gir"
             required
-            className="px-4 py-3 border border-stone-300 rounded-lg focus:outline-none focus:border-emerald-600 bg-white"
+            className="alan"
           />
         </div>
 
         <button
           type="submit"
-          className="mt-2 px-4 py-3 bg-emerald-700 text-white rounded-lg font-semibold hover:bg-emerald-800 transition-colors"
+          className="dugme mt-2 py-3!"
         >
           Kayıt Ol
         </button>

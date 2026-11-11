@@ -1,4 +1,7 @@
+import AuthKabuk from '@/components/AuthKabuk'
 import KayitFormu from './KayitFormu'
+
+export const metadata = { title: 'Kayıt Ol — Perdea' }
 
 export default async function KayitPage({
   searchParams,
@@ -9,13 +12,14 @@ export default async function KayitPage({
   const hata = params.hata
 
   return (
-    <main className="min-h-screen flex items-center justify-center px-6 py-12 bg-stone-100">
-      <div className="w-full max-w-md">
-        <h1 className="text-4xl font-bold text-emerald-700 text-center mb-8">
-          Perdea
-        </h1>
-        <KayitFormu hata={hata} />
-      </div>
-    </main>
+    <AuthKabuk
+      slogan={
+        <>
+          Yerin ayrıldı. <em className="text-emerald-300">Perde</em> birazdan açılıyor.
+        </>
+      }
+    >
+      <KayitFormu hata={hata} />
+    </AuthKabuk>
   )
 }

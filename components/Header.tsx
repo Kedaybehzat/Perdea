@@ -2,6 +2,7 @@ import Link from "next/link";
 import { LogOut, MessageCircle, Search } from "lucide-react";
 import { cikisYap } from "@/app/auth/actions";
 import { createClient } from "@/lib/supabase/server";
+import { okunmamisSayisi } from "@/lib/sohbet";
 import Logo from "./Logo";
 import MobilMenu from "./MobilMenu";
 import NavBaglantilari from "./NavBaglantilari";
@@ -20,6 +21,7 @@ export default async function Header() {
       .maybeSingle();
     profil = data;
   }
+  const okunmamis = user ? await okunmamisSayisi() : 0;
 
   return (
     <header className="sticky top-0 z-50 bg-stone-50/90 backdrop-blur-md border-b border-stone-200">
@@ -52,10 +54,15 @@ export default async function Header() {
             <>
               <Link
                 href="/sohbet"
-                aria-label="Sohbetler"
-                className="hidden sm:block p-2 rounded-lg text-stone-600 hover:text-emerald-700 hover:bg-stone-100"
+                aria-label={okunmamis ? `Sohbetler, ${okunmamis} okunmamış mesaj` : "Sohbetler"}
+                className="relative p-2 rounded-lg text-stone-600 hover:text-emerald-700 hover:bg-stone-100"
               >
                 <MessageCircle className="w-5 h-5" />
+                {okunmamis > 0 && (
+                  <span className="animate-zipla absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-rose-600 text-white text-[10px] font-bold flex items-center justify-center ring-2 ring-stone-50">
+                    {okunmamis > 9 ? "9+" : okunmamis}
+                  </span>
+                )}
               </Link>
               <Link
                 href="/profil"

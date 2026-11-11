@@ -170,7 +170,7 @@ export async function bulusmayiIptalEt(bulusmaId: string): Promise<{ hata?: stri
 }
 
 export async function sikayetEt(
-  hedefTur: "bulusma" | "salon" | "salon_yorumu" | "oda" | "kullanici",
+  hedefTur: "bulusma" | "salon" | "salon_yorumu" | "oda" | "kullanici" | "entry" | "gonderi" | "sohbet",
   hedefId: string,
   sebep: string
 ): Promise<{ hata?: string }> {

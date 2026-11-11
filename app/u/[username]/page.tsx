@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { Calendar, Star, Heart, Film, Flame, UserPlus, Sparkles } from "lucide-react";
+import { Calendar, Star, Heart, Film, Flame, MessageCircle, Sparkles } from "lucide-react";
+import { sohbetBaslatAction } from "@/app/sohbet/actions";
 import AfisYok from "@/components/ui/AfisYok";
 import { yapimlariIdyeGoreCek, posterUrl, tmdbHazirMi } from "@/lib/tmdb";
 
@@ -153,20 +154,19 @@ export default async function KamuProfilSayfasi({ params }: Props) {
               Kendi profilim
             </Link>
           ) : benim ? (
-            <button
-              type="button"
-              className="dugme shrink-0"
-              title="Arkadaşlık özelliği yakında"
-            >
-              <UserPlus className="w-4 h-4" />
-              Arkadaş ekle
-            </button>
+<form action={sohbetBaslatAction} className="shrink-0">
+              <input type="hidden" name="kisiId" value={profil.id} />
+              <button type="submit" className="dugme" title="Karşılıklı eşleştiysen sohbet açılır">
+                <MessageCircle className="w-4 h-4" />
+                Mesaj yaz
+              </button>
+            </form>
           ) : (
             <Link
               href="/giris"
               className="dugme shrink-0"
             >
-              Takip etmek için giriş yap
+              Tanışmak için giriş yap
             </Link>
           )}
         </div>

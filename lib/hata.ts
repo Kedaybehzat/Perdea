@@ -26,6 +26,13 @@ const mesajlar: Record<string, string> = {
   KENDI_SORUN: "Kendi soruna cevap veremezsin.",
   CEVAP_GECERSIZ: "Geçersiz cevap.",
   CEVAP_BEKLE: "Sırayı devretmeden önce en az bir cevap bekle.",
+  // sohbet
+  ESLESME_YOK: "Yalnızca karşılıklı eşleştiğin kişilerle yazışabilirsin.",
+  ENGELLI: "Bu kişiyle mesajlaşma kapalı.",
+  SOHBET_YOK: "Sohbet bulunamadı.",
+  COK_HIZLI: "Biraz yavaş. Birkaç dakika sonra yeniden dene.",
+  // başlık
+  BASLIK_GECERSIZ: "Başlık 3–80 karakter olmalı.",
 };
 
 export function hataMesaji(

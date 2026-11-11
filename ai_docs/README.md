@@ -40,8 +40,7 @@ ai_docs/
 | Boş nav sayfaları (keşfet/eşleş/topluluk/vizyon) | `core/durum.md` + `gorevler/nav-sayfalari.md` |
 | Favori ekleme / puan verme | `core/durum.md` + `gorevler/favori-puan.md` + `core/sema.md` |
 | Eşleşme algoritması | `core/durum.md` + `gorevler/eslesme.md` + `core/sema.md` |
-| Başlık + entry (ekşi/twitter) | `core/durum.md` + `gorevler/baslik.md` + `core/sema.md` |
-| Birebir sohbet | `core/durum.md` + `gorevler/ozel-chat.md` + `core/sema.md` |
+| Sohbet / başlık + entry / akış | `core/durum.md` + `gorevler/sohbet-baslik-akis.md` |
 | Salon puanı / cosplay buluşması / Ben Kimim? odaları | `core/durum.md` + `gorevler/salon-cosplay-oyun.md` |
 | Yeni sayfa tasarlama (görsel dil) | `gorevler/salon-cosplay-oyun.md` → "Tasarım dili" + `app/globals.css` |
 | Yeni kod / yapıyı öğrenme | `core/mimari.md` |

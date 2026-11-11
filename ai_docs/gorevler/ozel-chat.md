@@ -1,3 +1,5 @@
+> **GEÇERSİZ (11 Kas 2026):** Bu özellik yapıldı; tablo ve dosya adları burada yazandan farklı. Güncel hali: `gorevler/sohbet-baslik-akis.md`. Aşağısı yalnızca tarihçe.
+
 # Görev: Özel chat (eşleşen kullanıcılarla birebir)
 
 **Durum:** `/sohbet` UI mockup var (`app/sohbet/page.tsx`), backend yok.

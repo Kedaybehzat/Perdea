@@ -29,7 +29,7 @@ export default function HakkimizdaPage() {
       </section>
 
       <section className="px-6 pb-16">
-        <div className="max-w-4xl mx-auto bg-white border border-stone-200 rounded-2xl p-6 md:p-10">
+        <div className="max-w-4xl mx-auto bg-white border border-stone-200 rounded-3xl p-6 md:p-10">
           <h2 className="text-2xl font-bold text-stone-900 mb-3">Fikir</h2>
           <p className="text-stone-700 leading-relaxed mb-6">
             Bir sinefil şu an 5 ayrı yerde vakit geçiriyor — Beyazperde haber
@@ -69,7 +69,7 @@ export default function HakkimizdaPage() {
       </section>
 
       <section className="px-6 pb-20">
-        <div className="max-w-3xl mx-auto bg-emerald-700 text-white rounded-2xl p-8 md:p-10 text-center">
+        <div className="max-w-3xl mx-auto perde-zemin text-white rounded-3xl p-8 md:p-10 text-center goster">
           <Heart className="w-8 h-8 mx-auto mb-4 fill-white" />
           <h2 className="text-2xl md:text-3xl font-bold mb-3">
             Sinefil topluluğuna katıl
@@ -100,7 +100,7 @@ function Kart({
   metin: string;
 }) {
   return (
-    <div className="bg-white border border-stone-200 rounded-2xl p-5">
+    <div className="bg-white border border-stone-200 rounded-3xl p-5">
       <div className="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 mb-3">
         {icon}
       </div>

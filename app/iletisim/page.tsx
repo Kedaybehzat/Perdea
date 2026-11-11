@@ -9,7 +9,7 @@ export default function IletisimPage() {
   return (
     <main className="bg-stone-50 min-h-screen px-6 py-16">
       <div className="max-w-2xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-3">
+        <h1 className="text-4xl md:text-5xl font-bold text-stone-900 mb-3">
           İletişim
         </h1>
         <p className="text-stone-600 mb-10 leading-relaxed">

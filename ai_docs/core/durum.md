@@ -37,7 +37,8 @@ Eski `~/Desktop/projects/perdea2` iCloud sync tuzağı yüzünden taşındı (`t
 - **Salon puanları** `/salonlar`, **Cosplay buluşmaları** `/cosplay`, **Ben Kimim? odaları** `/oyun` — full-stack. Ayrıntı: `gorevler/salon-cosplay-oyun.md`.
 - **DB:** `docs/migrations/2026-11-11_salon_cosplay_oyun.sql` Supabase SQL Editor'de BİR KEZ çalıştırılmalı (idempotent). Çalışmadıysa sayfalar "kurulum eksik" notu gösterir (`lib/hata.ts` → `kurulumEksikMi`).
 - **2. tur (aynı gün):** kesfet, vizyon, eslesme, profil, u/[username] yeni tasarıma geçti; hareket katmanı eklendi (`globals.css` → "Hareket" bölümü: `goster`, `sirali`, `kalkar`, `afis`, `iskelet`, `perde-acilis`, `konfeti`, `halka-dol`; sayfa geçişi `app/template.tsx`). Yeni parçalar: `PerdeBandi`, `AfisYok`, `UyumHalkasi`, `Konfeti`.
-- Hâlâ mockup/eski görünümde: topluluk, baslik, sohbet (backend'leriyle birlikte yapılacak), hakkimizda, iletisim.
+- **3. tur (aynı gün):** Sohbet (`/sohbet`), Başlıklar (`/baslik`), Akış (`/topluluk`) full-stack bitti → `gorevler/sohbet-baslik-akis.md`. **DB:** `docs/migrations/2026-11-11b_sohbet_baslik_akis.sql` de çalıştırılmalı (ilkinden SONRA). Mockup sayfa kalmadı.
+- Kullanılmayan eski bileşenler (silinebilir): `components/KarsilamaKarti.tsx`, `Sayac.tsx`, `YakindaSayfasi.tsx`.
 
 ## Kalan işler (sıralı)
 ### Önce Supabase'i canlı tut (blocker — bunlar çözülmeden hiçbiri çalışmaz)
@@ -45,14 +46,14 @@ Eski `~/Desktop/projects/perdea2` iCloud sync tuzağı yüzünden taşındı (`t
 2. [ ] **(Opsiyonel) Node 22'ye geç** — Supabase 20'de uyarı veriyor.
 
 ### Backend bekleyen UI mockup'ları (spec'leri hazır)
-3. [ ] **Başlık + entry** → `gorevler/baslik.md` — basliklar/entryler/entry_begeni/baslik_takip tabloları + RLS + lib + actions.
-4. [ ] **Özel chat** → `gorevler/ozel-chat.md` — friendships/conversations/messages tabloları + RLS + Realtime subscribe + lib + actions.
+3. [x] **Başlık + entry** — BİTTİ → `gorevler/sohbet-baslik-akis.md` (eski spec: `gorevler/baslik.md`) — basliklar/entryler/entry_begeni/baslik_takip tabloları + RLS + lib + actions.
+4. [x] **Özel chat** — BİTTİ → `gorevler/sohbet-baslik-akis.md` (eski spec: `gorevler/ozel-chat.md`) — friendships/conversations/messages tabloları + RLS + Realtime subscribe + lib + actions.
 5. [x] **Ben Kimim? oyun odaları** — BİTTİ (11 Kas 2026) → `gorevler/salon-cosplay-oyun.md`. Eski `karakter-oyunu.md` spec'i geçersiz.
-6. [ ] **Beğen/Geç kalıcı hale getir** (`/eslesme`) — `matches` tablosu + RLS, aynı adayı tekrar gösterme, karşılıklı beğen = eşleşme bildirim.
+6. [x] **Beğen/Geç kalıcı hale getir** (Codex yaptı, commit 7c1bd6a) (`/eslesme`) — `matches` tablosu + RLS, aynı adayı tekrar gösterme, karşılıklı beğen = eşleşme bildirim.
 
 ### Küçük işler
 7. [ ] **TMDB API key** — `.env.local`'da zaten var (`a95b...`). Vizyon/Keşfet çalışıyor.
-8. [ ] **Topluluk gerçek içerik** (post tablosu + feed) — şu an mockup.
+8. [x] **Topluluk gerçek içerik** — BİTTİ (gonderiler + beğeni).
 9. [ ] **Avatar yükleme** — Supabase Storage.
 10. [ ] **Canlı öncesi:** "Confirm email"i aç, akışı uyarla → `core/tuzaklar.md`.
 
@@ -62,4 +63,3 @@ Eski `~/Desktop/projects/perdea2` iCloud sync tuzağı yüzünden taşındı (`t
 ## Notlar
 - Repo canlıda `Kedaybehzat/Perdea.git` (perdea2 değil).
 - `movie_id integer` TMDB id'si; favori/rating tabloları tek sütun tuttuğu için şimdilik film/dizi karışık.
-- Mockup'lı sayfalarda (`/topluluk`, `/baslik`, `/sohbet`) sarı "Önizleme" kutusu var — spec dosyasına link.

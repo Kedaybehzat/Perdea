@@ -1,178 +1,193 @@
-import { MessageSquareText, Plus, TrendingUp, Clock } from "lucide-react";
+import Link from "next/link";
+import { Flame, MessagesSquare, Search } from "lucide-react";
+import { createClient } from "@/lib/supabase/server";
+import { basliklariListele, sonEntryler } from "@/lib/baslik";
+import { goreceli } from "@/lib/zaman";
+import PerdeBandi from "@/components/ui/PerdeBandi";
+import BosDurum from "@/components/ui/BosDurum";
+import KurulumNotu from "@/components/ui/KurulumNotu";
+import Avatar from "@/components/ui/Avatar";
+import { BaslikAcFormu } from "./Formlar";
 
 export const metadata = {
   title: "Başlıklar — Perdea",
-  description: "Film/dizi/anime başlıkları ve entry'ler — ekşi ile twitter'ın karışımı.",
+  description: "Bir yapım, bir başlık; altına herkes iki satır yazar.",
 };
 
-type Entry = {
-  yazar: string;
-  yazarBas: string;
-  zaman: string;
-  metin: string;
-};
+type Sira = "gundem" | "yeni" | "kalabalik";
 
-type Baslik = {
-  id: string;
-  baslik: string;
-  hakkinda: string;
-  entrySayisi: number;
-  takip: number;
-  sonEntry: Entry;
-};
+export default async function BasliklarSayfasi({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; sirala?: string }>;
+}) {
+  const { q, sirala } = await searchParams;
+  const sorgu = (q ?? "").trim().slice(0, 80);
+  const sira: Sira = sirala === "yeni" || sirala === "kalabalik" ? sirala : "gundem";
 
-const basliklar: Baslik[] = [
-  {
-    id: "1",
-    baslik: "korku perdesi s4 finali",
-    hakkinda: "dizi · Korku Perdesi",
-    entrySayisi: 142,
-    takip: 318,
-    sonEntry: {
-      yazar: "mert a.",
-      yazarBas: "M",
-      zaman: "3 dk önce",
-      metin:
-        "finaldeki son 7 dakika olmasa dizinin tamamını unuturdum. o 7 dakika uğruna 4 sezon beklemişiz gibi hissettirdi.",
-    },
-  },
-  {
-    id: "2",
-    baslik: "gece vardiyası neden sevilmiyor",
-    hakkinda: "film · Gece Vardiyası",
-    entrySayisi: 68,
-    takip: 97,
-    sonEntry: {
-      yazar: "deniz k.",
-      yazarBas: "D",
-      zaman: "12 dk önce",
-      metin:
-        "atmosferik korku türünün türkçe örneklerinden biri ama izleyici 'ne izledim ben' deyince puanı düşüyor. biraz sabır isteyen film.",
-    },
-  },
-  {
-    id: "3",
-    baslik: "rüzgarın hatıraları — ghibli kopyası mı",
-    hakkinda: "anime · Rüzgarın Hatıraları",
-    entrySayisi: 204,
-    takip: 511,
-    sonEntry: {
-      yazar: "selin t.",
-      yazarBas: "S",
-      zaman: "27 dk önce",
-      metin:
-        "kopya değil, aynı duyguyu arayan bir çalışma. ghibli'yi aramak ayıp değil, taklit etmek ayıp. bu film birincisini yapıyor.",
-    },
-  },
-  {
-    id: "4",
-    baslik: "en az bilinen türk gerilim filmleri",
-    hakkinda: "liste · türk sineması",
-    entrySayisi: 91,
-    takip: 162,
-    sonEntry: {
-      yazar: "efe k.",
-      yazarBas: "E",
-      zaman: "1 sa önce",
-      metin:
-        "+ sessiz çığlık (2008) + kıpkırmızı zamanlar (2019) + yedi uyuyanlar (2014). sırayla ve yüksek sesle izlenmeli.",
-    },
-  },
-  {
-    id: "5",
-    baslik: "spoiler vermeden yılın en iyi 3 dizisi",
-    hakkinda: "sohbet · 2026",
-    entrySayisi: 338,
-    takip: 802,
-    sonEntry: {
-      yazar: "zeynep d.",
-      yazarBas: "Z",
-      zaman: "2 sa önce",
-      metin:
-        "1-gece vardiyası (film olarak değil, dizi versiyonu) 2-korku perdesi s4 3-ilk 5 bölümünde karar verebildiğim bir tek: rüzgarın hatıraları.",
-    },
-  },
-];
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
 
-export default function BaslikSayfasi() {
+  const [{ basliklar, kurulumEksik }, sonlar] = await Promise.all([
+    basliklariListele({ q: sorgu, sirala: sira }),
+    sorgu ? Promise.resolve([]) : sonEntryler(4),
+  ]);
+
+  const baglanti = (s: Sira) => {
+    const p = new URLSearchParams();
+    if (sorgu) p.set("q", sorgu);
+    if (s !== "gundem") p.set("sirala", s);
+    const t = p.toString();
+    return t ? `/baslik?${t}` : "/baslik";
+  };
+
   return (
     <main className="bg-stone-50 min-h-screen">
-      <div className="max-w-4xl mx-auto px-6 py-10">
-        <div className="mb-8 flex items-end justify-between gap-4 flex-wrap">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-stone-900 mb-2 flex items-center gap-2">
-              Başlıklar
-              <MessageSquareText className="w-7 h-7 text-emerald-600" />
-            </h1>
-            <p className="text-stone-600">
-              Ekşi + Twitter karışımı. Bir yapım bir başlık, altına entry.
-            </p>
+      <PerdeBandi
+        ustEtiket="Başlıklar"
+        baslik="Herkesin bir"
+        vurgu="çift lafı var"
+        aciklama="Bir film, bir sahne, bir karakter. Başlığı aç, altına iki satır yaz; gerisi gelir."
+      >
+        <form action="/baslik" method="get" role="search" className="flex gap-2 md:w-96">
+          <div className="relative flex-1">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+            <input
+              type="search"
+              name="q"
+              defaultValue={sorgu}
+              placeholder="Başlık ara"
+              aria-label="Başlık ara"
+              className="alan pl-10! border-transparent!"
+            />
           </div>
-          <button
-            type="button"
-            className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-medium px-5 py-2.5 rounded-lg transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            Yeni başlık
+          <button type="submit" className="dugme bg-altin! text-perde-950! hover:brightness-105 shadow-none!">
+            Ara
           </button>
+        </form>
+      </PerdeBandi>
+
+      <div className="max-w-6xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-[1fr_22rem] gap-8 items-start">
+        <div className="min-w-0">
+          {kurulumEksik && <KurulumNotu dosya="docs/migrations/2026-11-11b_sohbet_baslik_akis.sql" />}
+
+          <div className="flex items-center justify-between gap-4 flex-wrap mb-5">
+            <nav className="inline-flex p-1 bg-stone-200/70 rounded-xl" aria-label="Sıralama">
+              {([
+                ["gundem", "Gündem"],
+                ["yeni", "Yeni açılan"],
+                ["kalabalik", "En kalabalık"],
+              ] as const).map(([s, etiket]) => (
+                <Link
+                  key={s}
+                  href={baglanti(s)}
+                  aria-current={sira === s ? "page" : undefined}
+                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    sira === s ? "bg-white text-emerald-800 shadow-sm" : "text-stone-600 hover:text-stone-900"
+                  }`}
+                >
+                  {etiket}
+                </Link>
+              ))}
+            </nav>
+            {sorgu && (
+              <p className="text-sm text-stone-500">
+                <strong className="text-stone-900">“{sorgu}”</strong> için {basliklar.length} başlık ·{" "}
+                <Link href="/baslik" className="underline underline-offset-4 hover:text-stone-900">
+                  temizle
+                </Link>
+              </p>
+            )}
+          </div>
+
+          {basliklar.length === 0 ? (
+            <BosDurum
+              icon={MessagesSquare}
+              baslik={sorgu ? "Bu başlık henüz açılmamış" : "İlk başlığı sen aç"}
+              aciklama={
+                sorgu
+                  ? `“${sorgu}” diye bir başlık yok. Yandaki formdan açabilirsin.`
+                  : "Son izlediğin şey hakkında iki satır yaz; başlık böyle başlar."
+              }
+            />
+          ) : (
+            <ol className="sirali bg-white border border-stone-200 rounded-3xl divide-y divide-stone-100 overflow-hidden">
+              {basliklar.map((b, i) => (
+                <li key={b.id}>
+                  <Link
+                    href={`/baslik/${b.slug}`}
+                    className="group flex items-center gap-4 px-5 py-4 hover:bg-stone-50 transition-colors"
+                  >
+                    <span className="font-display text-2xl font-bold text-stone-300 w-8 text-right tabular-nums group-hover:text-emerald-600 transition-colors">
+                      {i + 1}
+                    </span>
+                    <span className="flex-1 min-w-0">
+                      <span className="block font-semibold text-lg text-stone-900 group-hover:text-emerald-700 transition-colors [overflow-wrap:anywhere]">
+                        {b.baslik}
+                      </span>
+                      <span className="text-sm text-stone-500">
+                        son entry {goreceli(b.son_entry_at)}
+                      </span>
+                    </span>
+                    {b.bugun > 0 && (
+                      <span className="hidden sm:inline-flex items-center gap-1 text-xs font-bold text-altin-koyu bg-amber-50 border border-altin/40 px-2 py-1 rounded-full">
+                        <Flame className="w-3.5 h-3.5" />
+                        bugün {b.bugun}
+                      </span>
+                    )}
+                    <span className="text-right shrink-0">
+                      <span className="block font-display text-2xl font-bold text-stone-900 leading-none tabular-nums">
+                        {b.entry_sayisi}
+                      </span>
+                      <span className="text-[11px] uppercase tracking-wider text-stone-500">entry</span>
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ol>
+          )}
+
+          {sonlar.length > 0 && (
+            <section className="mt-12 goster">
+              <h2 className="text-3xl font-bold text-stone-900 mb-5">Az önce yazılanlar</h2>
+              <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {sonlar.map((e) => (
+                  <li key={e.id}>
+                    <Link
+                      href={`/baslik/${e.slug}`}
+                      className="kalkar block h-full bg-white border border-stone-200 rounded-2xl p-5 hover:border-emerald-300"
+                    >
+                      <p className="text-xs font-bold uppercase tracking-[0.16em] text-emerald-700 mb-2 line-clamp-1">
+                        {e.baslik}
+                      </p>
+                      <p className="text-stone-800 leading-relaxed line-clamp-3 [overflow-wrap:anywhere]">{e.icerik}</p>
+                      <p className="mt-3 flex items-center gap-2 text-sm text-stone-500">
+                        <Avatar ad={e.display_name || e.username || "Üye"} url={e.avatar_url} boyut="xs" />
+                        {e.username ?? "üye"} · {goreceli(e.created_at)}
+                      </p>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
         </div>
 
-        <div className="mb-6 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-xl px-4 py-3">
-          <strong>Önizleme:</strong> Başlık altyapısı henüz bağlı değil — aşağısı
-          mockup. Spec: <code>ai_docs/gorevler/baslik.md</code>.
-        </div>
-
-        <div className="flex items-center gap-4 mb-5 text-sm">
-          <button className="flex items-center gap-1.5 text-emerald-700 font-medium border-b-2 border-emerald-700 pb-2">
-            <TrendingUp className="w-4 h-4" />
-            Gündem
-          </button>
-          <button className="flex items-center gap-1.5 text-stone-500 hover:text-stone-700 pb-2">
-            <Clock className="w-4 h-4" />
-            Son hareket
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {basliklar.map((b) => (
-            <BaslikKart key={b.id} baslik={b} />
-          ))}
-        </div>
+        <aside className="lg:sticky lg:top-24 bg-white border border-stone-200 rounded-3xl p-6" id="baslik-ac">
+          <h2 className="text-2xl font-bold text-stone-900 mb-1">Başlık aç</h2>
+          <p className="text-sm text-stone-600 mb-5">
+            Aynı başlık zaten varsa yazdığın oraya eklenir.
+          </p>
+          {user ? (
+            <BaslikAcFormu onBaslik={basliklar.length === 0 ? sorgu : ""} />
+          ) : (
+            <div className="flex flex-col gap-2">
+              <Link href="/giris" className="dugme">Yazmak için giriş yap</Link>
+              <Link href="/kayit" className="dugme-cizgi">Kayıt ol</Link>
+            </div>
+          )}
+        </aside>
       </div>
     </main>
-  );
-}
-
-function BaslikKart({ baslik }: { baslik: Baslik }) {
-  return (
-    <article className="bg-white border border-stone-200 rounded-2xl p-5 hover:border-stone-300 transition-colors cursor-pointer">
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="min-w-0">
-          <h2 className="text-lg font-semibold text-emerald-700 hover:text-emerald-800 leading-snug">
-            {baslik.baslik}
-          </h2>
-          <p className="text-xs text-stone-500 mt-0.5">{baslik.hakkinda}</p>
-        </div>
-        <div className="text-right text-xs text-stone-500 shrink-0">
-          <p>
-            <strong className="text-stone-900">{baslik.entrySayisi}</strong> entry
-          </p>
-          <p>{baslik.takip} takip</p>
-        </div>
-      </div>
-
-      <div className="bg-stone-50 border-l-2 border-emerald-500 pl-3 pr-3 py-2.5 rounded">
-        <div className="flex items-center gap-2 mb-1.5">
-          <div className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-xs font-bold">
-            {baslik.sonEntry.yazarBas}
-          </div>
-          <span className="text-xs text-stone-700 font-medium">{baslik.sonEntry.yazar}</span>
-          <span className="text-xs text-stone-400">· {baslik.sonEntry.zaman}</span>
-        </div>
-        <p className="text-sm text-stone-700 leading-relaxed">
-          {baslik.sonEntry.metin}
-        </p>
-      </div>
-    </article>
   );
 }

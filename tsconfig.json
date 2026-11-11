@@ -39,6 +39,8 @@
     "/Users/ayberkalkan/.cache/perdea2-next/dev/types/**/*.ts"
   ],
   "exclude": [
+    "mobil",
+    "mobile",
     "node_modules"
   ]
 }

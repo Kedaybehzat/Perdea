@@ -41,6 +41,7 @@ ai_docs/
 | Favori ekleme / puan verme | `core/durum.md` + `gorevler/favori-puan.md` + `core/sema.md` |
 | Eşleşme algoritması | `core/durum.md` + `gorevler/eslesme.md` + `core/sema.md` |
 | Sohbet / başlık + entry / akış | `core/durum.md` + `gorevler/sohbet-baslik-akis.md` |
+| Mobil uygulama (Expo, `mobil/`) | `core/durum.md` + `gorevler/mobil.md` + `mobil/README.md` |
 | Sohbet medyası / bildirim / KVKK / hesap silme | `core/durum.md` + `gorevler/medya-bildirim-kvkk.md` |
 | Salon puanı / cosplay buluşması / Ben Kimim? odaları | `core/durum.md` + `gorevler/salon-cosplay-oyun.md` |
 | Yeni sayfa tasarlama (görsel dil) | `gorevler/salon-cosplay-oyun.md` → "Tasarım dili" + `app/globals.css` |

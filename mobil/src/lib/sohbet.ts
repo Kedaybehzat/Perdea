@@ -16,6 +16,7 @@ export type Mesaj = {
   icerik: string;
   created_at: string;
   tur: "metin" | "gorsel" | "ses";
+  sure_sn: number | null;
   medya_url: string | null;
 };
 
@@ -28,11 +29,11 @@ export function mesajOzeti(m: { icerik: string; tur?: string }): string {
 }
 
 export async function mesajlariGetir(sohbetId: string): Promise<Mesaj[]> {
-  type Satir = { id: number; gonderen_id: string; icerik: string; created_at: string; tur?: Mesaj["tur"]; medya_yolu?: string | null };
+  type Satir = { id: number; gonderen_id: string; icerik: string; created_at: string; tur?: Mesaj["tur"]; medya_yolu?: string | null; sure_sn?: number | null };
   let satirlar: Satir[];
   const yeni = await supabase
     .from("mesajlar")
-    .select("id, gonderen_id, icerik, created_at, tur, medya_yolu")
+    .select("id, gonderen_id, icerik, created_at, tur, medya_yolu, sure_sn")
     .eq("sohbet_id", sohbetId)
     .order("id", { ascending: false })
     .limit(200);
@@ -48,8 +49,8 @@ export async function mesajlariGetir(sohbetId: string): Promise<Mesaj[]> {
     satirlar = (yeni.data ?? []) as Satir[];
   }
 
-  // Görseller özel kovada; kısa ömürlü imzalı adres al.
-  const yollar = satirlar.filter((m) => m.tur === "gorsel" && m.medya_yolu).map((m) => m.medya_yolu!);
+  // Fotoğraf ve sesler özel kovada; kısa ömürlü imzalı adres al.
+  const yollar = satirlar.filter((m) => m.medya_yolu).map((m) => m.medya_yolu!);
   const adresler = new Map<string, string>();
   if (yollar.length) {
     const { data } = await supabase.storage.from("sohbet-medya").createSignedUrls(yollar, 3600);
@@ -62,6 +63,7 @@ export async function mesajlariGetir(sohbetId: string): Promise<Mesaj[]> {
     icerik: m.icerik,
     created_at: m.created_at,
     tur: m.tur ?? "metin",
+    sure_sn: m.sure_sn ?? null,
     medya_url: m.medya_yolu ? adresler.get(m.medya_yolu) ?? null : null,
   }));
 }

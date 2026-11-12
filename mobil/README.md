@@ -27,13 +27,41 @@ Telefon ve bilgisayar aynı Wi-Fi'da olmalı.
 
 > Expo Go her zaman en yeni SDK'yı destekler. "SDK uyumsuz" derse `npx expo install --fix` çalıştır.
 
+## Telefona bildirim (push)
+
+Bildirimleri veritabanı gönderir (`docs/migrations/2026-11-11d_mobil_push_avatar.sql`), ayrıca sunucu gerekmez.
+Uygulama tarafında bir kerelik kurulum:
+
+```bash
+npx eas-cli@latest login
+npx eas-cli@latest init          # app.json'a proje kimliğini (extra.eas.projectId) yazar
+```
+
+- **iPhone:** Expo Go ile de bildirim gelir.
+- **Android:** Expo Go push desteklemiyor; geliştirme derlemesi gerekir:
+  `npx eas-cli@latest build --profile development --platform android` → çıkan APK'yı telefona kur,
+  sonra `npx expo start` ile aç.
+
+## EAS'te ortam değişkenleri
+
+`.env.local` buluta gönderilmez. Derlemeden önce aynı üç değeri EAS'e bir kez tanımla:
+
+```bash
+npx eas-cli@latest env:create --environment production --name EXPO_PUBLIC_SUPABASE_URL --value "https://xxxx.supabase.co" --visibility plaintext
+npx eas-cli@latest env:create --environment production --name EXPO_PUBLIC_SUPABASE_ANON_KEY --value "..." --visibility plaintext
+npx eas-cli@latest env:create --environment production --name EXPO_PUBLIC_API_URL --value "https://perdea.vercel.app" --visibility plaintext
+```
+
+(`development` ve `preview` ortamları için de aynısı.)
+
 ## Mağazaya çıkarmak (EAS)
 
 ```bash
 npx eas-cli@latest login
-npx eas-cli@latest build --platform android   # .aab üretir (Google Play)
-npx eas-cli@latest build --platform ios       # Apple Developer hesabı gerekir
-npx eas-cli@latest submit
+npx eas-cli@latest build --profile preview --platform android      # telefona kurulabilir APK (deneme)
+npx eas-cli@latest build --profile production --platform android   # .aab (Google Play)
+npx eas-cli@latest build --profile production --platform ios       # Apple Developer hesabı gerekir
+npx eas-cli@latest submit --platform ios|android
 ```
 
 `app.json` içindeki `ios.bundleIdentifier` / `android.package` şu an `app.perdea.mobil`; mağazaya ilk
@@ -53,7 +81,8 @@ src/tema.ts         renkler, yazı tipleri, boşluklar (web'deki globals.css ile
 
 Kontrol: `npx tsc --noEmit` ve `npx expo export --platform ios` (paketlenebiliyor mu).
 
-## Henüz yok (sıradaki tur)
+## Mağaza kuralları için hazır olanlar
 
-Salon puanları, Ben Kimim? odaları, cosplay buluşmaları, başlıklar, bildirimler (push), sohbette fotoğraf/ses
-gönderme, profil düzenleme. Bunlar şimdilik web'de.
+Hesap silme (Profil → Profili düzenle), içerik bildirme (gönderi, entry, sohbet), kullanıcı engelleme (sohbet menüsü),
+18+ ve KVKK onayı (kayıt), izin açıklamaları (fotoğraf, mikrofon). Mağaza sayfası için gizlilik politikası adresi:
+`<site>/kvkk`.

@@ -1,22 +1,24 @@
-import { useFocusEffect } from "expo-router";
-import { Film, Heart, LogOut, Star } from "lucide-react-native";
+import { router, useFocusEffect } from "expo-router";
+import { Bell, ChevronRight, Film, Heart, LogOut, Pencil, Star, type LucideIcon } from "lucide-react-native";
 import { useCallback, useState } from "react";
-import { Linking, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Afis from "@/components/Afis";
 import { PerdeZemin } from "@/components/Perde";
 import { Avatar, BosDurum, Dugme, Metin } from "@/components/temel";
 import { useOturum } from "@/lib/oturum";
+import { pushSil } from "@/lib/push";
+import { useSayilar } from "@/lib/sayac";
 import { supabase } from "@/lib/supabase";
 import { posterUrl, yapimlar, type Yapim } from "@/lib/tmdb";
 import { bosluk, kose, renk, yazi } from "@/tema";
 
-const SITE = (process.env.EXPO_PUBLIC_API_URL ?? "").replace(/\/$/, "");
 
 export default function Profil() {
   const { oturum, profil, profiliYenile } = useOturum();
   const benId = oturum?.user.id;
   const kenar = useSafeAreaInsets();
+  const { bildirim } = useSayilar();
   const [favoriIdleri, setFavoriIdleri] = useState<number[]>([]);
   const [puanSayisi, setPuanSayisi] = useState(0);
   const [afisler, setAfisler] = useState<Map<number, Yapim>>(new Map());
@@ -77,20 +79,15 @@ export default function Profil() {
         )}
 
         <View style={s.kutu}>
-          <Metin tur="kucuk">
-            Profilini düzenlemek ve hesabını silmek şimdilik web sitesinden yapılıyor.
-          </Metin>
-          {SITE ? (
-            <Dugme tur="cizgi" onPress={() => Linking.openURL(`${SITE}/profil/duzenle`)}>
-              Web’de profili düzenle
-            </Dugme>
-          ) : null}
+          <Satir ikon={Bell} etiket="Bildirimler" sayi={bildirim} onPress={() => router.push("/bildirimler")} />
+          <Satir ikon={Pencil} etiket="Profili düzenle" onPress={() => router.push("/profil-duzenle")} />
           <Dugme
             tur="cizgi"
             ikon={LogOut}
             bekliyor={cikiyor}
             onPress={async () => {
               setCikiyor(true);
+              await pushSil();
               await supabase.auth.signOut();
             }}
           >
@@ -99,6 +96,26 @@ export default function Profil() {
         </View>
       </View>
     </ScrollView>
+  );
+}
+
+function Satir({ ikon: Ikon, etiket, sayi, onPress }: { ikon: LucideIcon; etiket: string; sayi?: number; onPress: () => void }) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={sayi ? `${etiket}, ${sayi} yeni` : etiket}
+      style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: bosluk.m, paddingVertical: 10, opacity: pressed ? 0.7 : 1 })}
+    >
+      <Ikon size={20} color={renk.zumrutKoyu} />
+      <Text style={{ flex: 1, fontFamily: yazi.yariKalin, fontSize: 16, color: renk.yazi }}>{etiket}</Text>
+      {sayi ? (
+        <View style={{ minWidth: 22, height: 22, paddingHorizontal: 6, borderRadius: 11, backgroundColor: renk.gul, alignItems: "center", justifyContent: "center" }}>
+          <Text style={{ fontFamily: yazi.kalin, fontSize: 12, color: "#fff" }}>{sayi > 99 ? "99+" : sayi}</Text>
+        </View>
+      ) : null}
+      <ChevronRight size={18} color={renk.yaziSoluk} />
+    </Pressable>
   );
 }
 

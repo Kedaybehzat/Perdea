@@ -57,9 +57,11 @@ export async function medyaYukle(
 // Tarayıcının kaydedebildiği ses biçimi.
 export function sesBicimi(): { mime: string; tip: string; uzanti: string } | null {
   if (typeof MediaRecorder === "undefined") return null;
+  // Önce AAC/MP4: iPhone'daki uygulama webm çalamıyor. Desteklemeyen tarayıcı webm'e düşer.
   const adaylar = [
+    { mime: "audio/mp4;codecs=mp4a.40.2", tip: "audio/mp4", uzanti: "m4a" },
+    { mime: "audio/mp4", tip: "audio/mp4", uzanti: "m4a" },
     { mime: "audio/webm;codecs=opus", tip: "audio/webm", uzanti: "webm" },
-    { mime: "audio/mp4", tip: "audio/mp4", uzanti: "mp4" },
     { mime: "audio/ogg;codecs=opus", tip: "audio/ogg", uzanti: "ogg" },
   ];
   return adaylar.find((a) => MediaRecorder.isTypeSupported(a.mime)) ?? null;

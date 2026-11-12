@@ -10,9 +10,12 @@ import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
-import { Text, View } from "react-native";
+import * as Notifications from "expo-notifications";
+import { Platform, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { OturumSaglayici, useOturum } from "@/lib/oturum";
+import { pushKaydet, yolaGit } from "@/lib/push";
+import { SayacSaglayici } from "@/lib/sayac";
 import { ayarlarEksik } from "@/lib/supabase";
 import { renk } from "@/tema";
 
@@ -51,7 +54,8 @@ function Gezinme({ yazilarHazir }: { yazilarHazir: boolean }) {
 
   const girisli = Boolean(oturum);
   return (
-    <>
+    <SayacSaglayici aktif={girisli}>
+      <PushBaglantisi girisli={girisli} />
       <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: renk.krem } }}>
         <Stack.Protected guard={!girisli}>
@@ -60,10 +64,37 @@ function Gezinme({ yazilarHazir }: { yazilarHazir: boolean }) {
         <Stack.Protected guard={girisli}>
           <Stack.Screen name="(sekmeler)" />
           <Stack.Screen name="sohbet/[id]" />
+          <Stack.Screen name="baslik/[slug]" />
+          <Stack.Screen name="salon/index" />
+          <Stack.Screen name="salon/[id]" />
+          <Stack.Screen name="cosplay/index" />
+          <Stack.Screen name="cosplay/yeni" />
+          <Stack.Screen name="cosplay/[id]" />
+          <Stack.Screen name="oyun/index" />
+          <Stack.Screen name="oyun/[kod]" />
+          <Stack.Screen name="bildirimler" />
+          <Stack.Screen name="profil-duzenle" />
         </Stack.Protected>
       </Stack>
-    </>
+    </SayacSaglayici>
   );
+}
+
+// Giriş yapılınca telefonu push için kaydet; bildirime dokunulunca ilgili ekrana git.
+function PushBaglantisi({ girisli }: { girisli: boolean }) {
+  useEffect(() => {
+    if (!girisli || Platform.OS === "web") return;
+    void pushKaydet(true);
+    const abone = Notifications.addNotificationResponseReceivedListener((yanit) => {
+      yolaGit(yanit.notification.request.content.data?.yol);
+    });
+    // Uygulama kapalıyken bildirime dokunarak açıldıysa.
+    void Notifications.getLastNotificationResponseAsync().then((yanit) => {
+      if (yanit) yolaGit(yanit.notification.request.content.data?.yol);
+    });
+    return () => abone.remove();
+  }, [girisli]);
+  return null;
 }
 
 // .env.local doldurulmadan açılırsa boş ekran yerine ne yapılacağını söyle.

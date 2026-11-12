@@ -36,7 +36,28 @@
           "imageWidth": 120
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Sohbette fotoğraf göndermek ve profil fotoğrafını değiştirmek için fotoğraflarına erişmemiz gerekiyor.",
+          "cameraPermission": false,
+          "microphonePermission": "Sohbette sesli mesaj kaydetmek için mikrofonuna erişmemiz gerekiyor."
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Sohbette sesli mesaj kaydetmek için mikrofonuna erişmemiz gerekiyor."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#064e3b",
+          "defaultChannel": "varsayilan"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

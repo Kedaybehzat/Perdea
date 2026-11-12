@@ -1,6 +1,6 @@
 # Mobil uygulama (`mobil/`)
 
-**Durum:** 1. tur bitti (11 Kas 2026). Expo SDK 58 · React Native 0.88 · Expo Router (dosya tabanlı) · TypeScript.
+**Durum:** Özellik olarak web ile eşit (12 Kas 2026). Gerçek cihazda henüz denenmedi. Expo SDK 58 · React Native 0.88 · Expo Router (dosya tabanlı) · TypeScript.
 **Önce oku:** `mobil/README.md` (kurulum, çalıştırma, mağaza).
 
 ## Kurallar
@@ -14,14 +14,29 @@
 ## Dosya haritası
 | Ekran | Dosya |
 |---|---|
-| Kök düzen, yazı tipleri, oturum koruması | `src/app/_layout.tsx` |
+| Kök düzen, yazı tipleri, oturum koruması, push kaydı, bildirime dokununca yönlendirme | `src/app/_layout.tsx` |
 | Karşılama / Giriş / Kayıt (KVKK onaylı) | `src/app/(giris)/` |
-| Sekmeler | `src/app/(sekmeler)/_layout.tsx` |
-| Keşfet (trend, arama, favori, puan) | `src/app/(sekmeler)/index.tsx` |
-| Eşleş (aday kartı, Beğen/Geç, kutlama) | `src/app/(sekmeler)/eslesme.tsx` |
-| Sohbet listesi / tek sohbet | `src/app/(sekmeler)/sohbet.tsx`, `src/app/sohbet/[id].tsx` |
-| Akış | `src/app/(sekmeler)/akis.tsx` |
-| Profil | `src/app/(sekmeler)/profil.tsx` |
+| Sekmeler (Keşfet, Eşleş, Sohbet, Topluluk, Profil) + rozetler | `src/app/(sekmeler)/` |
+| Topluluk: Akış + Başlıklar listesi | `src/app/(sekmeler)/topluluk.tsx`, `src/components/topluluk/` |
+| Başlık içi | `src/app/baslik/[slug].tsx` |
+| Salon puanları | `src/app/salon/` |
+| Cosplay buluşmaları | `src/app/cosplay/` |
+| Ben Kimim? | `src/app/oyun/` (`[kod].tsx`: 3 sn yoklama, Realtime yok) |
+| Tek sohbet (yazı, fotoğraf, ses, engelle, bildir) | `src/app/sohbet/[id].tsx` |
+| Bildirimler | `src/app/bildirimler.tsx` |
+| Profil düzenle (avatar yükleme, hesap silme) | `src/app/profil-duzenle.tsx` |
+| Ortak | `src/components/` (temel, Perde, Afis, Kart, UstCubuk, BildirModal) |
+| Yardımcılar | `src/lib/` (supabase, oturum, sayac, push, medya, tmdb, eslesme, sohbet, oyun, hata, zaman, sehirler) |
+
+## Push
+- Şema: `docs/migrations/2026-11-11d_mobil_push_avatar.sql` → `cihazlar` tablosu, `cihaz_kaydet/cihaz_sil` RPC, `bildirimler` ve `mesajlar` INSERT tetikleyicileri `pg_net` ile `https://exp.host/--/api/v2/push/send`'e istek atar. Push hatası asıl işlemi bozmaz.
+- İstemci: `src/lib/push.ts`. Bildirim `data.yol` web yolu taşır; `yolaGit` uygulama ekranına çevirir (rotalar web yollarıyla aynı tutuldu: `/sohbet`, `/topluluk`, `/baslik/x`, `/cosplay/x`, `/bildirimler`).
+- `extra.eas.projectId` yoksa (eas init yapılmadıysa) push sessizce kapalı kalır. Android'de Expo Go push desteklemez → development build.
+
+## Medya
+- Fotoğraf: `expo-image-picker` → `expo-image-manipulator` (1600 px JPEG, EXIF silinir) → `sohbet-medya` kovası → `medya_mesaji_gonder`.
+- Ses: `expo-audio` `RecordingPresets.HIGH_QUALITY` (m4a / `audio/mp4`), en çok 120 sn. Web tarafı da artık önce `audio/mp4` kaydetmeye çalışıyor (iPhone webm çalamıyor).
+- Avatar: `avatarlar` (herkese açık) kovası, yol `<user_id>/<dosya>.jpg`.
 
 ## Doğrulama
 - `cd mobil && npx tsc --noEmit`
@@ -29,8 +44,6 @@
 - Görsel kontrol: `npx expo export --platform web` çıktısını statik sunup tarayıcıda 390 px genişlikte bakılabilir (1. tur böyle test edildi). **Gerçek cihazda henüz denenmedi.**
 
 ## Sıradaki tur
-1. Sohbette fotoğraf (`expo-image-picker`) ve ses (`expo-audio`) gönderme + ses çalma.
-2. Push bildirim (`expo-notifications`): cihaz belirteci tablosu + Supabase Edge Function ya da veritabanı webhook'u ile gönderim.
-3. Salon puanları, Başlıklar, Ben Kimim?, Cosplay ekranları.
-4. Profil düzenleme, avatar yükleme, hesap silme (şimdilik web'e yönlendiriyor).
-5. EAS Build + mağaza gönderimi (`eas.json` henüz yok).
+1. Gerçek cihaz testi (iOS Expo Go + Android development build) ve çıkan düzeltmeler.
+2. `eas init`, ikon/açılış görseli son hâli, mağaza ekran görüntüleri.
+3. Silinen hesap/sohbetin Storage dosyalarını temizleyen iş (şu an yetim kalıyor).

@@ -19,6 +19,15 @@ import { bosluk, buyuk, kose, renk, yazi } from "@/tema";
 
 type Tur = "baslik" | "altBaslik" | "govde" | "kucuk" | "etiket";
 
+// Etiketler Türkçe büyük harfle yazılır; "{ad} soruyor" gibi parçalı metinleri de birleştirir.
+function etiketMetni(children: ReactNode): ReactNode {
+  if (typeof children === "string") return buyuk(children);
+  if (Array.isArray(children) && children.every((c) => typeof c === "string" || typeof c === "number")) {
+    return buyuk(children.join(""));
+  }
+  return children;
+}
+
 export function Metin({
   tur = "govde",
   renk: r,
@@ -28,7 +37,7 @@ export function Metin({
 }: TextProps & { tur?: Tur; renk?: string }) {
   return (
     <Text {...kalan} style={[s[tur], r ? { color: r } : null, style]}>
-      {tur === "etiket" && typeof children === "string" ? buyuk(children) : children}
+      {tur === "etiket" ? etiketMetni(children) : children}
     </Text>
   );
 }
